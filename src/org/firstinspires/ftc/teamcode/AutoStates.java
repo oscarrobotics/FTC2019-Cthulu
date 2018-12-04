@@ -64,9 +64,9 @@ public class AutoStates extends BaseOp {
         Unknown
     }
 
-    double leftVal = 1;
-    double centerVal = 75;
-    double rightVal = 160;
+    private double leftVal = 1;
+    private double centerVal = 75;
+    private double rightVal = 160;
 
     private StartPosition lander = StartPosition.Depot;
     private CubePosition cubePosition;
@@ -99,11 +99,11 @@ public class AutoStates extends BaseOp {
 
     public CubePosition checkCube() {
         pixyData = pixyCam.read(0x51, 5);
+        numObjects = 0xFF&pixyData[0];
         pixyX = 0xFF&pixyData[1];
         pixyY = 0xFF&pixyData[2];
         pixyWidth = 0xFF&pixyData[3];
         pixyHeight = 0xFF&pixyData[4];
-        numObjects = 0xFF&pixyData[0];
 
         if (pixyX >= rightVal) return CubePosition.Right;
         else if (pixyX >= centerVal) return CubePosition.Center;

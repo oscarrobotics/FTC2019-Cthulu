@@ -44,9 +44,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * This hardware class assumes the following device names have been configured on the robot:
  * Note:  All names are lower case and some have single spaces between words.
  *
- * Motor channel:  Left  drive motor:        "left_drive"
- * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
+ * Motor channel:  Left  mDrive motor:        "left_drive"
+ * Motor channel:  Right mDrive motor:        "right_drive"
+ * Motor channel:  Manipulator mDrive motor:  "left_arm"
  * Servo channel:  Servo to open left claw:  "left_hand"
  * Servo channel:  Servo to open right claw: "right_hand"
  */
@@ -72,12 +72,12 @@ public class HardwarePushbot
 
     }
 
-    /* Initialize standard Hardware interfaces */
+    /* init standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
 
-        // Define and Initialize Motors
+        // Define and init Motors
         leftDrive  = hwMap.get(DcMotor.class, "leftFront");
         rightDrive = hwMap.get(DcMotor.class, "rightFront");
         leftArm    = hwMap.get(DcMotor.class, "leftArm");

@@ -173,7 +173,7 @@ public class BaseOp extends OpMode {
         intakeArmVertical.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
         intakeArmExtend = hardwareMap.dcMotor.get("intakeArmExtend");
-        
+
         intakeArmExtend.setDirection(DcMotor.Direction.FORWARD);
         intakeArmExtend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
@@ -237,19 +237,19 @@ public class BaseOp extends OpMode {
             if (rotStickX == 0 && lastKnownRotJoy != 0.0) {
                 targetHeading = currentGyroHeading;
             }
-    
+
             lastKnownRotJoy = rotStickX;
-    
+
             if (rotStickX != 0) {
                 targetHeading = (currentGyroHeading + (maxIncrement * rotStickX)) % 360;
             }
         } else {
-           rotation = rotStickX; 
+            rotation = rotStickX;
         }
-        
 
 
-        // DPad drive
+
+        // DPad mDrive
         if (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right) {
             if (gamepad1.dpad_down) { // backwards
                 speed = gamepad1.right_bumper ? .5 : 0.3;
@@ -265,30 +265,30 @@ public class BaseOp extends OpMode {
                 direction = Math.atan2(0, -speed) - Math.PI / 4;
             }
         }
-        // Joystick drive
+        // Joystick mDrive
         else {
             speed = Math.hypot(driveStickX, driveStickY);
             direction = Math.atan2(driveStickY, -driveStickX) - Math.PI / 4;
         }
-        
+
         // if(Math.abs(speed - lastSpeed) >= 0.02)
         //     speed = speed > lastSpeed ? lastSpeed + 0.02 : lastSpeed - 0.02;
-        
+
         MecanumDrive(speed, direction, rotation, target, rotationCorrection);
-       // lastSpeed = speed;
+        // lastSpeed = speed;
     }
 
     protected boolean MecanumDrive(double speed, double direction, double rotation, int target) {
-        
+
         boolean rotationCorrection = true;
         return MecanumDrive(speed, direction, rotation, target, rotationCorrection);
-        
+
     }
 
     protected boolean MecanumDrive(double speed, double direction, double rotation, int target, boolean rotationCorrection) {
 
         if (rotation == 0) {
-            rotation = rotationComp();    
+            rotation = rotationComp();
         }
 
 
@@ -317,7 +317,7 @@ public class BaseOp extends OpMode {
         leftBack.setPower(v3);
         rightBack.setPower(v4);
 
-        if ((targetDestination != 0 && Math.abs(leftBack.getCurrentPosition() - targetDestination) < 100) 
+        if ((targetDestination != 0 && Math.abs(leftBack.getCurrentPosition() - targetDestination) < 100)
             || (direction == 0) && (Math.abs(targetHeading-currentGyroHeading) <=3) ) {
             targetDestination = 0;
             return true;

@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file illustrates the concept of driving a path based on Gyro heading and encoder counts.
- * It uses the common Pushbot hardware class to define the drive on the robot.
+ * It uses the common Pushbot hardware class to define the mDrive on the robot.
  * The code is structured as a LinearOpMode
  *
  * The code REQUIRES that you DO have encoders on the wheels,
@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.util.Range;
  *  This code ALSO requires that you have a Modern Robotics I2C gyro with the name "gyro"
  *   otherwise you would use: PushbotAutoDriveByEncoder;
  *
- *  This code requires that the drive Motors have been configured such that a positive
+ *  This code requires that the mDrive Motors have been configured such that a positive
  *  power command moves them forward, and causes the encoders to count UP.
  *
  *  This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
@@ -84,7 +84,7 @@ public class AutoDriveByGyro extends LinearOpMode {
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
 
     // These constants define the desired driving/control characteristics
-    // The can/should be tweaked to suite the specific robot drive train.
+    // The can/should be tweaked to suite the specific robot mDrive train.
     static final double     DRIVE_SPEED             = 0.7;     // Nominal speed for better accuracy.
     static final double     TURN_SPEED              = 0.5;     // Nominal half speed for better accuracy.
 
@@ -97,7 +97,7 @@ public class AutoDriveByGyro extends LinearOpMode {
     public void runOpMode() {
 
         /*
-         * Initialize the standard drive system variables.
+         * init the standard mDrive system variables.
          * The init() method of the hardware class does most of the work here
          */
         robot.init(hardwareMap);
@@ -152,7 +152,7 @@ public class AutoDriveByGyro extends LinearOpMode {
 
 
    /**
-    *  Method to drive on a fixed compass bearing (angle), based on encoder counts.
+    *  Method to mDrive on a fixed compass bearing (angle), based on encoder counts.
     *  Move will stop if either of these conditions occur:
     *  1) Move gets to the desired position
     *  2) Driver stops the opmode running.
@@ -222,7 +222,7 @@ public class AutoDriveByGyro extends LinearOpMode {
                 robot.leftDrive.setPower(leftSpeed);
                 robot.rightDrive.setPower(rightSpeed);
 
-                // Display drive status for the driver.
+                // Display mDrive status for the driver.
                 telemetry.addData("Err/St",  "%5.1f/%5.1f",  error, steer);
                 telemetry.addData("Target",  "%7d:%7d",      newLeftTarget,  newRightTarget);
                 telemetry.addData("Actual",  "%7d:%7d",      robot.leftDrive.getCurrentPosition(),
