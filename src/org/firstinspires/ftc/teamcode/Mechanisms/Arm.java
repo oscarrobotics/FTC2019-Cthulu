@@ -13,17 +13,8 @@ public class Arm extends OscarCommon {
     private static DcMotor _intakeCollect, _intakeArmExtend, _intakeArmVertical;
     private static Servo _dumpServo;
 
-    private int armYtargetPos = 0;
-    private int armExtendTargetPos = 0;
-
-    private double rightTrigger;
-    private double leftTrigger;
-    private boolean contSpin = false;
-    private boolean leftTriggerPressed = false;
-    private boolean verticalArmLimitWasPressed = false;
-    private boolean wasArmLimetEverPressed = false;
-
     private static final double DUMP_OPEN = .7;
+    private static final double DUMP_CLOSE = .2;
     private static final int ARMYPOSITIONSCORE = 2750;
     private static final int ARMEXTENDSCORE = 2800;
     private static final int ARMYPOSITIONPARALLEL = 100;
@@ -119,7 +110,10 @@ public class Arm extends OscarCommon {
         _intakeCollect.setPower(-unSuccPower);
     }
 
-    public static void dumpMineral() {
-        _dumpServo.setPosition(DUMP_OPEN);
+    public static void dumpMineral(boolean state) {
+        if (state)
+            _dumpServo.setPosition(DUMP_OPEN);
+        else
+            _dumpServo.setPosition(DUMP_CLOSE);
     }
 }

@@ -44,4 +44,12 @@ public class TeleOp extends OscarBaseOp {
         telemetry.addLine("Elevator Actual: " + Lift.getTargetPos());
         //telemetry.addLine("Dump Servo " );
     }
+
+    public void RunArm(){
+
+    }
+
+    public void DumpControl(){
+        Arm.dumpMineral(gamepad2.left_bumper);
+    }
 }
