@@ -13,6 +13,16 @@ public class Arm extends OscarCommon {
     private static DcMotor _intakeCollect, _intakeArmExtend, _intakeArmVertical;
     private static Servo _dumpServo;
 
+    private int armYtargetPos = 0;
+    private int armExtendTargetPos = 0;
+
+    private double rightTrigger;
+    private double leftTrigger;
+    private boolean contSpin = false;
+    private boolean leftTriggerPressed = false;
+    private boolean verticalArmLimitWasPressed = false;
+    private boolean wasArmLimetEverPressed = false;
+
     private static final double DUMP_OPEN = .7;
     private static final int ARMYPOSITIONSCORE = 2750;
     private static final int ARMEXTENDSCORE = 2800;
@@ -47,6 +57,18 @@ public class Arm extends OscarCommon {
 
     public static int getVerticalPos() {
         return _intakeArmVertical.getCurrentPosition();
+    }
+
+    public static int getHorizontalPos() {
+        return _intakeArmExtend.getCurrentPosition();
+    }
+
+    public static int getVerticalTargetPos() {
+        return _intakeArmVertical.getTargetPosition();
+    }
+
+    public static int getHorizontalTargetPos() {
+        return _intakeArmExtend.getTargetPosition();
     }
 
     public static void moveVertical(int setpoint, double power) {

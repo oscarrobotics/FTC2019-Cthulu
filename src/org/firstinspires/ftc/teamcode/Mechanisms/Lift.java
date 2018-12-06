@@ -25,6 +25,14 @@ public class Lift extends OscarCommon {
         _elevator.setTargetPosition(position);
     }
 
+    public static int getTargetPos(){
+        return _elevator.getTargetPosition();
+    }
+
+    public static int getCurrentPos(){
+        return _elevator.getCurrentPosition();
+    }
+
     public static void runToTop(){
         setPosition(ELEVATOR_MAX);
     }
@@ -32,4 +40,6 @@ public class Lift extends OscarCommon {
     public static void runToBottom(){
         setPosition(ELEVATOR_MIN);
     }
+
+
 }
