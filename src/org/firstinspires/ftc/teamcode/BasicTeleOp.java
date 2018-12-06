@@ -135,6 +135,7 @@ public class BasicTeleOp extends BaseOp {
                 intakeCollect.setPower(0.0);
             }
         }
+
         //Arm fine control
         if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2){
             armExtendTargetPos += (int)(gamepad2.right_stick_y*20);

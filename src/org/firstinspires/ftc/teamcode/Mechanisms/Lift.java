@@ -2,13 +2,15 @@ package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.Base.Hardware;
 import org.firstinspires.ftc.teamcode.Base.OscarCommon;
 
 public class Lift extends OscarCommon {
     private static DcMotor _elevator;
-    private static final int ELEVATOR_MAX = 4000;
+    private static final int ELEVATOR_MAX = 4150;
     private static final int ELEVATOR_MIN = 0;
+    private static final int ELEVATOR_INCREMENT = 30;
 
     public static void init() {
         _elevator = Hardware.MechanismMotors.elevator;
@@ -29,7 +31,11 @@ public class Lift extends OscarCommon {
         return _elevator.getTargetPosition();
     }
 
-    public static int getCurrentPos(){
+    public static void adjustPos(boolean direction) {
+        setPosition((direction ? 1 : -1) * ELEVATOR_INCREMENT);
+    }
+
+    public static int getCurrentPos() {
         return _elevator.getCurrentPosition();
     }
 
@@ -42,4 +48,6 @@ public class Lift extends OscarCommon {
     }
 
 
+    public static void teleopControl(Gamepad gamepads) {
+    }
 }

@@ -2,9 +2,10 @@ package org.firstinspires.ftc.teamcode.Base;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class MecanumDrive extends OscarCommon{
-
+public class MecanumDrive extends OscarCommon {
+    
     private static DcMotor _frontLeft, _frontRight, _backLeft, _backRight;
 
     // Mecanum Variables
@@ -12,6 +13,9 @@ public class MecanumDrive extends OscarCommon{
     public static double Direction = 0;
     public static double Rotation = 0;
     public static int TargetDestination = 0;
+
+    private static double lastKnownRotJoy = 0.0;
+    private static final int MaxIncrement = 100;
 
     public static void init() {
         _frontLeft = Hardware.DriveMotors.frontLeft;
@@ -44,11 +48,53 @@ public class MecanumDrive extends OscarCommon{
 
     }
 
-    protected static boolean AutoDrive(double speed, double direction, double rotation, int distance, boolean rotationComp) {
-        return Drive(speed, direction, rotation, distance, true);
+    protected static boolean AutoDrive(double Speed, double direction, double rotation, int distance, boolean rotationComp) {
+        return Drive(Speed, direction, rotation, distance, true);
     }
 
-    protected static boolean Drive(double speed, double direction, double rotation, int autoDistance, boolean rotationCorrection) {
+    public static void teleopDrive(Gamepad gamepad){
+        boolean rotationCorrection = true;
+
+        double rotate = Math.pow(gamepad.left_stick_x, 3);
+        double strafe = gamepad.right_stick_x;
+        double forward = gamepad.right_stick_y;
+
+        if (rotationCorrection) {
+            if (rotate == 0 && lastKnownRotJoy != 0.0) {
+                Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+            }
+            lastKnownRotJoy = rotate;
+
+            if (rotate != 0) {
+                Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (MaxIncrement * rotate)) % 360;
+            }
+        } else {
+            Rotation = rotate;
+        }
+
+        // DPad mDrive
+        if (gamepad.dpad_up || gamepad.dpad_down || gamepad.dpad_left || gamepad.dpad_right) {
+            if (gamepad.dpad_down) { // backwards
+                Speed = gamepad.right_bumper ? 0.3 : 0.5;
+                Direction = Math.atan2(Speed, 0) - Math.PI / 4;
+            } else if (gamepad.dpad_left) { // left
+                Speed = 0.75;
+                Direction = Math.atan2(0, Speed) - Math.PI / 4;
+            } else if (gamepad.dpad_up) { // forwards
+                Speed = gamepad.right_bumper ? 0.3 : 0.5;
+                Direction = Math.atan2(-Speed, 0) - Math.PI / 4;
+            } else { // right
+                Speed = 0.75;
+                Direction = Math.atan2(0, -Speed) - Math.PI / 4;
+            }
+        } else {
+            Speed = Math.hypot(strafe, forward);
+            Direction = Math.atan2(forward, -strafe) - Math.PI / 4;
+        }
+        Drive(Speed, Direction, Rotation, 0, rotationCorrection);
+    }
+
+    protected static boolean Drive(double Speed, double direction, double rotation, int autoDistance, boolean rotationCorrection) {
 
         if (rotation == 0) {
             rotation = Gyro.getCompensation();
@@ -70,10 +116,10 @@ public class MecanumDrive extends OscarCommon{
                 .addData("Dest", TargetDestination);
 
 
-        final double v1 = speed * Math.cos(direction) + rotation;
-        final double v2 = speed * Math.sin(direction) - rotation;
-        final double v3 = speed * Math.sin(direction) + rotation;
-        final double v4 = speed * Math.cos(direction) - rotation;
+        final double v1 = Speed * Math.cos(direction) + rotation;
+        final double v2 = Speed * Math.sin(direction) - rotation;
+        final double v3 = Speed * Math.sin(direction) + rotation;
+        final double v4 = Speed * Math.cos(direction) - rotation;
 
         _frontLeft.setPower(v1);
         _frontRight.setPower(v2);
@@ -88,6 +134,5 @@ public class MecanumDrive extends OscarCommon{
             return false;
         }
     }
-
 
 }

@@ -1,5 +1,8 @@
-package org.firstinspires.ftc.teamcode.Base;
+package org.firstinspires.ftc.teamcode.OpModes;
 
+import org.firstinspires.ftc.teamcode.Base.Hardware;
+import org.firstinspires.ftc.teamcode.Base.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Base.OscarBaseOp;
 import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 
@@ -31,11 +34,10 @@ public class TeleOp extends OscarBaseOp {
     public void loop() {
         super.loop();
 
-        MecanumGamepadDrive();
-        RunElevator();
-        RunArm();
+        MecanumDrive.teleopDrive(gamepad1);
+        Lift.teleopControl(gamepad2);
+        Arm.teleopControl(gamepad2);
         DumpControl();
-        RunLimit();
         telemetry.addLine("Arm Vertical target " + Arm.getVerticalTargetPos());
         telemetry.addLine("Arm Vertical actual   " + Arm.getVerticalPos());
         telemetry.addLine("Arm Horizontal Target: " + Arm.getHorizontalPos());
@@ -43,10 +45,6 @@ public class TeleOp extends OscarBaseOp {
         telemetry.addLine("Elevator Target: " + Lift.getTargetPos());
         telemetry.addLine("Elevator Actual: " + Lift.getTargetPos());
         //telemetry.addLine("Dump Servo " );
-    }
-
-    public void RunArm(){
-
     }
 
     public void DumpControl(){
