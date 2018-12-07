@@ -101,17 +101,19 @@ public class Arm extends OscarCommon {
         double ArmXStick = gamepad.right_stick_y;
         double ArmYStick = gamepad.left_stick_y;
 
-        if(Math.abs(ArmXStick) > .15) { // deadzone
+        if(Math.abs(ArmXStick) > .1) { // deadzone
             armXTargetPos += (int) (ArmXStick * ARM_X_INCREMENT);
         } else {
             armXTargetPos = _intakeArmExtend.getCurrentPosition();
         }
+        moveArmX(armXTargetPos, 0.5);
 
-         if(Math.abs(ArmYStick) > .15) {
+         if(Math.abs(ArmYStick) > .1) {
             armYTargetPos += (int) (ArmYStick * ARM_Y_INCREMENT);
          } else {
             armYTargetPos = _intakeArmVertical.getCurrentPosition();
          }
+         moveArmY(armYTargetPos, 0.5);
     }
 
     public static void score() {

@@ -47,7 +47,11 @@ public class Lift extends OscarCommon {
         setPosition(ELEVATOR_MIN);
     }
 
+    public static void teleopControl(Gamepad gamepad) {
+        boolean dPadUp = gamepad.dpad_up;
+        boolean dPadDown = gamepad.dpad_down;
 
-    public static void teleopControl(Gamepad gamepads) {
+        if (dPadUp) { adjustPos(true); }
+        else if (dPadDown) { adjustPos(false); }
     }
 }
