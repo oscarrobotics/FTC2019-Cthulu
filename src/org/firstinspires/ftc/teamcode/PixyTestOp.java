@@ -55,6 +55,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name = "Pixy Test", group="Iterative Opmode")
+@Disabled
 
 public class PixyTestOp extends LinearOpMode {
     I2cDeviceSynch pixyCam;

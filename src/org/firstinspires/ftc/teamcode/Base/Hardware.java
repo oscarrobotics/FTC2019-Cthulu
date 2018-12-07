@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Base;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.*;
 
-public class Hardware {
+public class Hardware extends OscarCommon {
 
     public static class Setpoints {
         public static double dumpServoInit = 0.95;
@@ -62,5 +62,6 @@ public class Hardware {
 
         Sensors.armLimitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
         Sensors.armLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
+        _telemetry.addData("HARDWARE", "INIT");
     }
 }

@@ -56,8 +56,8 @@ public class MecanumDrive extends OscarCommon {
         boolean rotationCorrection = true;
 
         double rotate = Math.pow(gamepad.left_stick_x, 3);
-        double strafe = gamepad.right_stick_x;
-        double forward = gamepad.right_stick_y;
+        double rightStickX = gamepad.right_stick_x;
+        double rightStickY = gamepad.right_stick_y;
 
         if (rotationCorrection) {
             if (rotate == 0 && lastKnownRotJoy != 0.0) {
@@ -88,8 +88,8 @@ public class MecanumDrive extends OscarCommon {
                 Direction = Math.atan2(0, -Speed) - Math.PI / 4;
             }
         } else {
-            Speed = Math.hypot(strafe, forward);
-            Direction = Math.atan2(forward, -strafe) - Math.PI / 4;
+            Speed = Math.hypot(rightStickX, rightStickY);
+            Direction = Math.atan2(rightStickY, -rightStickX) - Math.PI / 4;
         }
         Drive(Speed, Direction, Rotation, 0, rotationCorrection);
     }

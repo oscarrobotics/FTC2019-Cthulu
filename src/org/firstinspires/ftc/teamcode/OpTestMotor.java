@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="TeleOpMotorTest", group="Iterative Opmode")
-
+@Disabled
 public class OpTestMotor extends BaseOp
 {
     

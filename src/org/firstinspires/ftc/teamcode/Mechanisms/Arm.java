@@ -35,16 +35,18 @@ public class Arm extends OscarCommon {
 
     public static void init() {
         _intakeCollect = Hardware.MechanismMotors.intakeCollect;
-        _intakeArmExtend = Hardware.MechanismMotors.intakeCollect;
-        _intakeArmVertical = Hardware.MechanismMotors.intakeCollect;
+        _intakeArmExtend = Hardware.MechanismMotors.intakeArmExtend;
+        _intakeArmVertical = Hardware.MechanismMotors.intakeArmVertical;
 
         _intakeCollect.setDirection(DcMotorSimple.Direction.FORWARD);
-        _intakeArmExtend.setDirection(DcMotorSimple.Direction.FORWARD);
+        _intakeArmExtend.setDirection(DcMotorSimple.Direction.REVERSE);
         _intakeArmVertical.setDirection(DcMotorSimple.Direction.FORWARD);
 
         _intakeCollect.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         _intakeArmExtend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         _intakeArmVertical.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        _dumpServo = Hardware.Servos.dumpServo;
     }
 
     public static void zeroEncoders() {
@@ -101,19 +103,27 @@ public class Arm extends OscarCommon {
         double ArmXStick = gamepad.right_stick_y;
         double ArmYStick = gamepad.left_stick_y;
 
-        if(Math.abs(ArmXStick) > .1) { // deadzone
+        if (Math.abs(ArmXStick) > .1) { // deadzone
             armXTargetPos += (int) (ArmXStick * ARM_X_INCREMENT);
         } else {
             armXTargetPos = _intakeArmExtend.getCurrentPosition();
         }
         moveArmX(armXTargetPos, 0.5);
 
-         if(Math.abs(ArmYStick) > .1) {
+         if (Math.abs(ArmYStick) > .1) {
             armYTargetPos += (int) (ArmYStick * ARM_Y_INCREMENT);
          } else {
             armYTargetPos = _intakeArmVertical.getCurrentPosition();
          }
          moveArmY(armYTargetPos, 0.5);
+
+         if (gamepad.right_trigger > 0.1){
+             succ(gamepad.right_trigger);
+         } else if (gamepad.left_trigger > 0.1){
+             unSucc(gamepad.left_trigger);
+         } else {
+             _intakeCollect.setPower(0.0);
+         }
     }
 
     public static void score() {
@@ -127,11 +137,11 @@ public class Arm extends OscarCommon {
     }
 
     public static void succ(double succPower) {
-        _intakeCollect.setPower(succPower);
+        _intakeCollect.setPower(Math.pow(succPower, 2));
     }
 
     public static void unSucc(double unSuccPower) {
-        _intakeCollect.setPower(-unSuccPower);
+        _intakeCollect.setPower(-Math.pow(unSuccPower, 2));
     }
 
     public static void dumpMineral(boolean state) {

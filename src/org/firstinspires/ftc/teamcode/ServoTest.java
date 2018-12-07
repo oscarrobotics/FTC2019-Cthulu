@@ -42,6 +42,7 @@ import java.util.Date;
  * or add a @Disabled annotation to prevent this OpMode from being added to the Driver Station
  */
 @TeleOp
+@Disabled
 
 public class ServoTest extends BaseOp {
     /* Declare OpMode members. */

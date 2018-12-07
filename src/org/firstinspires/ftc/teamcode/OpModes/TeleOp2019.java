@@ -6,7 +6,11 @@ import org.firstinspires.ftc.teamcode.Base.OscarBaseOp;
 import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 
-public class TeleOp extends OscarBaseOp {
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+@TeleOp(name = "TeleOp2019", group="Iterative Opmode")
+
+public class TeleOp2019 extends OscarBaseOp {
 
     private boolean autoEnabled = false;
 
@@ -25,9 +29,9 @@ public class TeleOp extends OscarBaseOp {
     @Override
     public void start() {
         autoEnabled = false;
-        Hardware.MechanismMotors.elevator.setPower(.5);
-        Hardware.MechanismMotors.intakeArmVertical.setPower(0.5);
-        Hardware.MechanismMotors.intakeArmExtend.setPower(0.5);
+//        Hardware.MechanismMotors.elevator.setPower(.5);
+//        Hardware.MechanismMotors.intakeArmVertical.setPower(0.5);
+//        Hardware.MechanismMotors.intakeArmExtend.setPower(0.5);
     }
 
     @Override

@@ -37,6 +37,11 @@ public class Gyro extends OscarCommon {
         return true;
     }
 
+    public static void zero() {
+        update();
+        TargetHeading = CurrentGyroHeading;
+    }
+
     protected static double getCompensation(boolean isTurning) {
         double rotation = 0.0;
         double gyro = CurrentGyroHeading;

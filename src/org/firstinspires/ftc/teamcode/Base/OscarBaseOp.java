@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Base;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
+import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 
 public class OscarBaseOp extends OpMode {
 
@@ -16,7 +18,15 @@ public class OscarBaseOp extends OpMode {
         // set up the drivetrain
         MecanumDrive.init();
         MecanumDrive.zeroEncoders();
+
+        Arm.init();
+        Arm.zeroEncoders();
+
+        Lift.init();
+        Lift.zeroEncoders();
+
         Gyro.init();
+        Gyro.zero();
     }
 
     @Override
