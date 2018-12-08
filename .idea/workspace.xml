@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3974d5a2-38fe-4710-9488-ba1c1fe1ba81" name="Default" comment="Added more arm methods and lift methods as well as added Teleop Class (not sure if neccessary)">
+    <list default="true" id="3974d5a2-38fe-4710-9488-ba1c1fe1ba81" name="Default" comment="Added are methods for teleop">
+      <change afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ant.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Lift.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Lift.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,11 +20,23 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/OscarBaseOp.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="374">
-                  <caret line="24" column="5" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+                <state relative-caret-position="544">
+                  <caret line="34" column="5" selection-start-line="34" selection-start-column="5" selection-end-line="34" selection-end-column="5" />
                   <folding>
                     <element signature="e#531#532#0" expanded="true" />
                     <element signature="e#560#561#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="354">
+                  <caret line="59" column="70" selection-start-line="59" selection-start-column="70" selection-end-line="59" selection-end-column="70" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -33,21 +46,9 @@
             <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="725">
-                  <caret line="116" column="5" lean-forward="true" selection-start-line="99" selection-start-column="4" selection-end-line="116" selection-end-column="5" />
+                  <caret line="126" column="5" selection-start-line="126" selection-start-column="5" selection-end-line="126" selection-end-column="5" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#3054#3055#0" expanded="true" />
-                    <element signature="e#3106#3107#0" expanded="true" />
-                    <element signature="e#3144#3145#0" expanded="true" />
-                    <element signature="e#3198#3199#0" expanded="true" />
-                    <element signature="e#3233#3234#0" expanded="true" />
-                    <element signature="e#3274#3275#0" expanded="true" />
-                    <element signature="e#3310#3311#0" expanded="true" />
-                    <element signature="e#3356#3357#0" expanded="true" />
-                    <element signature="e#4146#4147#0" expanded="true" />
-                    <element signature="e#4196#4197#0" expanded="true" />
-                    <element signature="e#4249#4250#0" expanded="true" />
-                    <element signature="e#4302#4303#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -67,10 +68,19 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="476">
+                  <caret line="31" column="22" lean-forward="true" selection-start-line="31" selection-start-column="22" selection-end-line="31" selection-end-column="22" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="657">
-                  <caret line="55" column="62" lean-forward="true" selection-start-line="55" selection-start-column="62" selection-end-line="55" selection-end-column="62" />
+                <state relative-caret-position="456">
+                  <caret line="55" column="62" selection-start-line="55" selection-start-column="62" selection-end-line="55" selection-end-column="62" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -78,16 +88,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp.java">
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="572">
-                  <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                    <element signature="e#598#599#0" expanded="true" />
-                    <element signature="e#631#632#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="102">
+                  <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
                 </state>
               </provider>
             </entry>
@@ -95,28 +100,11 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Lift.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="810">
-                  <caret line="53" column="40" lean-forward="true" selection-start-line="53" selection-start-column="40" selection-end-line="53" selection-end-column="40" />
+                <state relative-caret-position="629">
+                  <caret line="65" column="45" selection-start-line="65" selection-start-column="45" selection-end-line="65" selection-end-column="45" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#997#998#0" expanded="true" />
-                    <element signature="e#1050#1051#0" expanded="true" />
-                    <element signature="e#1089#1090#0" expanded="true" />
-                    <element signature="e#1141#1142#0" expanded="true" />
-                    <element signature="e#1196#1197#0" expanded="true" />
-                    <element signature="e#1266#1267#0" expanded="true" />
-                    <element signature="e#1307#1308#0" expanded="true" />
-                    <element signature="e#1360#1361#0" expanded="true" />
                   </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/libs/RobotCore-release-sources.jar!/com/qualcomm/robotcore/hardware/DcMotor.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3026">
-                  <caret line="209" column="8" selection-start-line="209" selection-start-column="8" selection-end-line="209" selection-end-column="8" />
                 </state>
               </provider>
             </entry>
@@ -128,31 +116,13 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/BaseOp.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4012">
+                <state relative-caret-position="1391">
                   <caret line="252" column="16" selection-start-line="252" selection-start-column="16" selection-end-line="252" selection-end-column="16" />
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/libs/RobotCore-release-sources.jar!/com/qualcomm/robotcore/eventloop/opmode/OpMode.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="238">
-                  <caret line="52" column="14" selection-start-line="52" selection-start-column="14" selection-end-line="52" selection-end-column="14" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="jar://$PROJECT_DIR$/libs/RobotCore-release-sources.jar!/com/qualcomm/robotcore/hardware/Gamepad.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="34">
-                  <caret line="30" column="9" selection-start-line="30" selection-start-column="9" selection-end-line="30" selection-end-column="40" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/BasicTeleOp.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="596">
@@ -161,11 +131,14 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/AutoStates.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="969">
-                  <caret line="77" column="21" selection-start-line="77" selection-start-column="21" selection-end-line="77" selection-end-column="21" />
+                <state relative-caret-position="-136">
+                  <caret line="117" column="14" selection-start-line="117" selection-start-column="14" selection-end-line="117" selection-end-column="82" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -216,7 +189,6 @@
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/RunMode.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/OscarOpMode.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/AutoStates.java" />
-        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/OscarBaseOp.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Elevator.java" />
@@ -227,6 +199,8 @@
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Lift.java" />
+        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java" />
+        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java" />
       </list>
     </option>
   </component>
@@ -294,7 +268,7 @@
     <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="true" />
     <property name="GenerateAntBuildDialog.outputFileNameProperty" value="ftc2019-cthulu" />
     <property name="SearchEverywhereHistoryKey" value="mecanum&#9;PSI&#9;JAVA://org.firstinspires.ftc.teamcode.BaseOp#MecanumGamepadDrive&#10;angles&#9;PSI&#9;JAVA://org.firstinspires.ftc.teamcode.BaseOp#angles&#10;settings&#9;ACTION&#9;ShowSettings&#10;External Tools&#9;ACTION&#9;ExternalToolsGroup&#10;External&#9;ACTION&#9;ExternalToolsGroup" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544064363142" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544302656755" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/libs" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
@@ -400,14 +374,21 @@
       <option name="project" value="LOCAL" />
       <updated>1544064395598</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added are methods for teleop">
+      <created>1544152611717</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1544152611717</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17382617" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17532468" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -424,7 +405,7 @@
       <window_info anchor="bottom" id="FRC" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32934782" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="10" weight="0.32934782" />
+      <window_info anchor="bottom" id="Version Control" order="10" visible="true" weight="0.18511066" />
       <window_info anchor="bottom" id="Messages" order="11" weight="0.32897383" />
       <window_info anchor="bottom" id="Tail" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -443,25 +424,12 @@
     <MESSAGE value="Added methods for lift positions" />
     <MESSAGE value="Added more arm methods and also added Teleop Class (not sure if necessary)" />
     <MESSAGE value="Added more arm methods and lift methods as well as added Teleop Class (not sure if neccessary)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added more arm methods and lift methods as well as added Teleop Class (not sure if neccessary)" />
+    <MESSAGE value="Added are methods for teleop" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added are methods for teleop" />
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="FILTER_TARGETS" value="true" />
-    <buildFile url="file://$PROJECT_DIR$/ftc2019-cthulu.xml">
-      <targetFilters>
-        <filter targetName="compile.module.ftc2019" isVisible="true" />
-        <filter targetName="compile.module.ftc2019.production" isVisible="true" />
-        <filter targetName="compile.module.ftc2019.tests" isVisible="true" />
-        <filter targetName="clean.module.ftc2019" isVisible="true" />
-        <filter targetName="init" isVisible="true" />
-        <filter targetName="clean" isVisible="true" />
-        <filter targetName="upload" isVisible="false" />
-        <filter targetName="build.modules" isVisible="true" />
-        <filter targetName="all" isVisible="true" />
-      </targetFilters>
-      <expanded value="true" />
-    </buildFile>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/FTC2019.iml">
@@ -531,24 +499,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#1051#1052#0" />
-            <element signature="e#1084#1085#0" />
-            <element signature="e#1116#1117#0" />
-            <element signature="e#1149#1150#0" />
-            <element signature="e#1185#1186#0" />
-            <element signature="e#1222#1223#0" />
-            <element signature="e#1259#1260#0" />
-            <element signature="e#1297#1298#0" />
-            <element signature="e#1348#1349#0" />
-            <element signature="e#1392#1393#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/libs/RobotCore-release-sources.jar!/com/qualcomm/robotcore/hardware/Servo.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
@@ -567,13 +517,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/OscarBaseOp.java">
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Lift.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="24" column="5" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+        <state relative-caret-position="629">
+          <caret line="65" column="45" selection-start-line="65" selection-start-column="45" selection-end-line="65" selection-end-column="45" />
           <folding>
-            <element signature="e#531#532#0" expanded="true" />
-            <element signature="e#560#561#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -585,9 +534,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="572">
+          <caret line="35" selection-start-line="35" selection-end-line="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#598#599#0" expanded="true" />
+            <element signature="e#631#632#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/BaseOp.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4012">
+        <state relative-caret-position="1391">
           <caret line="252" column="16" selection-start-line="252" selection-start-column="16" selection-end-line="252" selection-end-column="16" />
         </state>
       </provider>
@@ -606,10 +567,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/AutoStates.java">
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="969">
-          <caret line="77" column="21" selection-start-line="77" selection-start-column="21" selection-end-line="77" selection-end-column="21" />
+        <state relative-caret-position="456">
+          <caret line="55" column="62" selection-start-line="55" selection-start-column="62" selection-end-line="55" selection-end-column="62" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -617,6 +581,24 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="596">
           <caret line="172" selection-start-line="172" selection-end-line="172" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/OscarBaseOp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="34" column="5" selection-start-line="34" selection-start-column="5" selection-end-line="34" selection-end-column="5" />
+          <folding>
+            <element signature="e#531#532#0" expanded="true" />
+            <element signature="e#560#561#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -634,61 +616,36 @@
     <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="725">
-          <caret line="116" column="5" lean-forward="true" selection-start-line="99" selection-start-column="4" selection-end-line="116" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3054#3055#0" expanded="true" />
-            <element signature="e#3106#3107#0" expanded="true" />
-            <element signature="e#3144#3145#0" expanded="true" />
-            <element signature="e#3198#3199#0" expanded="true" />
-            <element signature="e#3233#3234#0" expanded="true" />
-            <element signature="e#3274#3275#0" expanded="true" />
-            <element signature="e#3310#3311#0" expanded="true" />
-            <element signature="e#3356#3357#0" expanded="true" />
-            <element signature="e#4146#4147#0" expanded="true" />
-            <element signature="e#4196#4197#0" expanded="true" />
-            <element signature="e#4249#4250#0" expanded="true" />
-            <element signature="e#4302#4303#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="657">
-          <caret line="55" column="62" lean-forward="true" selection-start-line="55" selection-start-column="62" selection-end-line="55" selection-end-column="62" />
+          <caret line="126" column="5" selection-start-line="126" selection-start-column="5" selection-end-line="126" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Lift.java">
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/AutoStates.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="810">
-          <caret line="53" column="40" lean-forward="true" selection-start-line="53" selection-start-column="40" selection-end-line="53" selection-end-column="40" />
+        <state relative-caret-position="-136">
+          <caret line="117" column="14" selection-start-line="117" selection-start-column="14" selection-end-line="117" selection-end-column="82" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#997#998#0" expanded="true" />
-            <element signature="e#1050#1051#0" expanded="true" />
-            <element signature="e#1089#1090#0" expanded="true" />
-            <element signature="e#1141#1142#0" expanded="true" />
-            <element signature="e#1196#1197#0" expanded="true" />
-            <element signature="e#1266#1267#0" expanded="true" />
-            <element signature="e#1307#1308#0" expanded="true" />
-            <element signature="e#1360#1361#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp.java">
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
+        <state relative-caret-position="476">
+          <caret line="31" column="22" lean-forward="true" selection-start-line="31" selection-start-column="22" selection-end-line="31" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="354">
+          <caret line="59" column="70" selection-start-line="59" selection-start-column="70" selection-end-line="59" selection-end-column="70" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#598#599#0" expanded="true" />
-            <element signature="e#631#632#0" expanded="true" />
           </folding>
         </state>
       </provider>
