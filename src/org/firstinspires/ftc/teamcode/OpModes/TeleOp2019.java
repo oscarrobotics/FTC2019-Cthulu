@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
-import org.firstinspires.ftc.teamcode.Base.Hardware;
-import org.firstinspires.ftc.teamcode.Base.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Base.NewMecanumDrive;
 import org.firstinspires.ftc.teamcode.Base.OscarBaseOp;
 import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
@@ -38,7 +37,7 @@ public class TeleOp2019 extends OscarBaseOp {
     public void loop() {
         super.loop();
 
-        MecanumDrive.teleopDrive(gamepad1);
+        NewMecanumDrive.teleopControl(gamepad1);
         Lift.teleopControl(gamepad2);
         Arm.teleopControl(gamepad2);
         DumpControl();

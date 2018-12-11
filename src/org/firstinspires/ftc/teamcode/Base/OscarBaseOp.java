@@ -18,8 +18,8 @@ public class OscarBaseOp extends OpMode {
         Hardware.init(hardwareMap);
 
         // set up the drivetrain
-        MecanumDrive.init();
-        MecanumDrive.zeroEncoders();
+        NewMecanumDrive.init();
+        NewMecanumDrive.zeroEncoders();
 
         Arm.init();
         Arm.zeroEncoders();

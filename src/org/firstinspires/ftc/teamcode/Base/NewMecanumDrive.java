@@ -8,9 +8,9 @@ public class NewMecanumDrive {
 
     private static DcMotor _frontLeft, _frontRight, _backLeft, _backRight;
 
-    private double gyroMaxRotationRate = 0.0;
-    private double gyroAssistKp = 1.0;
-    private boolean gyroAssistEnabled = false;
+    private static double gyroMaxRotationRate = 0.0;
+    private static double gyroAssistKp = .1;
+    private static boolean gyroAssistEnabled = true;
 
     public static void init() {
         _frontLeft = Hardware.DriveMotors.frontLeft;
@@ -55,18 +55,18 @@ public class NewMecanumDrive {
         this.gyroAssistEnabled = false;
     }
 
-    public boolean isGyroAssistEnabled() {
+    public static boolean isGyroAssistEnabled() {
         return gyroAssistEnabled;
     }
 
-    public double getGyroAssistPower(double rotation) {
+    public static double getGyroAssistPower(double rotation) {
         double error = rotation - Gyro.getZRotationRate()/gyroMaxRotationRate;
         return gyroAssistEnabled? Util.clipRange(gyroAssistKp*error): 0.0;
     }
 
-    protected void holonomicDrive(double x, double y, double rotation, boolean inverted, double gyroAngle) {
+    protected static void holonomicDrive(double x, double y, double rotation, boolean inverted, double gyroAngle) {
         x = Util.clipRange(x);
-        x = Util.clipRange(y);
+        y = Util.clipRange(y);
         rotation = Util.clipRange(rotation);
 
         if (inverted) {
@@ -97,13 +97,13 @@ public class NewMecanumDrive {
         _backRight.setPower(wheelPowers[3]);
     }
 
-    public void teleopControl(Gamepad gamepad) {
+    public static void teleopControl(Gamepad gamepad) {
 
         double rotateStick = Math.pow(gamepad.left_stick_x, 3);
         double rightStickX = gamepad.right_stick_x;
         double rightStickY = gamepad.right_stick_y;
 
         // TODO: Test this!
-        holonomicDrive(rightStickX, rightStickY, rotateStick, false, Gyro.CurrentGyroHeading);
+        holonomicDrive(rightStickX, rightStickY, rotateStick, true, Gyro.CurrentGyroHeading);
     }
 }

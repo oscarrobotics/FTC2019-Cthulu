@@ -41,7 +41,7 @@ public class Gyro extends OscarCommon {
     }
 
     public static double getZRotationRate() {
-        return velocity.zRotationRate;
+        return velocity.yRotationRate;
     }
 
     protected static double getCompensation(boolean isTurning) {
@@ -68,7 +68,8 @@ public class Gyro extends OscarCommon {
     }
 
     public static void update() {
-        angles = Hardware.Sensors.imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+        angles = Hardware.Sensors.imu.getAngularOrientation(
+                AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
         gravity = Hardware.Sensors.imu.getGravity();
         velocity = Hardware.Sensors.imu.getAngularVelocity();
         CurrentGyroHeading = angles.firstAngle;

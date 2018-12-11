@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 import static org.firstinspires.ftc.teamcode.Base.Pixy.CubePosition.*;
 import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.State.*;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates", group = "Oscar")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
 public class Autonomous2019 extends OscarBaseOp {
 
     private int stateCounter = 0;
@@ -86,6 +86,8 @@ public class Autonomous2019 extends OscarBaseOp {
 
     public void loop() {
         super.loop();
+
+        /*
         telemetry.addLine("STATE: " + mCurrentState);
         switch (mCurrentState) {
             case STATE_INITIAL:
@@ -298,13 +300,14 @@ public class Autonomous2019 extends OscarBaseOp {
              intakeArmExtend.setTargetPosition(-700);
              newState(STATE_STOP);
            break;
-        */
 
             case STATE_STOP:
                 MecanumDrive(0, 0, 0, 0);
                 break;
 
         }
+        */
+
     }
 
     private void newState(State newState) {
