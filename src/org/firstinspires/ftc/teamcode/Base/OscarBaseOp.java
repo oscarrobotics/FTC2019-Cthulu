@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 
 public class OscarBaseOp extends OpMode {
 
+    public static boolean IsAuton = false;
+
     @Override
     public void init() {
 

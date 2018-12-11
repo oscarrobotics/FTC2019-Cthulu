@@ -55,21 +55,21 @@ public class MecanumDrive extends OscarCommon {
     public static void teleopDrive(Gamepad gamepad){
         boolean rotationCorrection = true;
 
-        double rotate = Math.pow(gamepad.left_stick_x, 3);
+        double rotateStick = Math.pow(gamepad.left_stick_x, 3);
         double rightStickX = gamepad.right_stick_x;
         double rightStickY = gamepad.right_stick_y;
 
         if (rotationCorrection) {
-            if (rotate == 0 && lastKnownRotJoy != 0.0) {
+            if (rotateStick == 0 && lastKnownRotJoy != 0.0) {
                 Gyro.TargetHeading = Gyro.CurrentGyroHeading;
             }
-            lastKnownRotJoy = rotate;
+            lastKnownRotJoy = rotateStick;
 
-            if (rotate != 0) {
-                Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (MaxIncrement * rotate)) % 360;
+            if (rotateStick != 0) {
+                Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (MaxIncrement * rotateStick)) % 360;
             }
         } else {
-            Rotation = rotate;
+            Rotation = rotateStick;
         }
 
         // DPad mDrive

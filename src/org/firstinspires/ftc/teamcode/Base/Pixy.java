@@ -23,25 +23,27 @@ public class Pixy extends OscarCommon {
         PixyData.width = 0xFF&i2cData[3];
         PixyData.height = 0xFF&i2cData[4];
 
-        if (PixyData.x >= rightBound) PixyData.cubePosition = CubePosition.Right;
-        else if (PixyData.x >= centerBound) PixyData.cubePosition = CubePosition.Center;
-        else if (PixyData.x >= leftBound) PixyData.cubePosition = CubePosition.Left;
+        if (PixyData.x >= rightBound) PixyData.cubePosition = CubePosition.RIGHT_CUBE;
+        else if (PixyData.x >= centerBound) PixyData.cubePosition = CubePosition.CENTER_CUBE;
+        else if (PixyData.x >= leftBound) PixyData.cubePosition = CubePosition.LEFT_CUBE;
+        else PixyData.cubePosition = CubePosition.UNKNOWN_CUBE;
+        _telemetry.addLine("CubePos: " + PixyData.cubePosition);
         // defaults to Unknown
     }
 
-    public static int cubeX(){
+    public static int getCubeX(){
         return PixyData.x;
     }
 
-    public static int cubeY(){
+    public static int getCubeY(){
         return PixyData.y;
     }
 
-    public static int cubeWidth(){
+    public static int getCubeWidth(){
         return PixyData.width;
     }
 
-    public static int cubeHeight(){
+    public static int getCubeHeight(){
         return PixyData.height;
     }
 
@@ -50,10 +52,10 @@ public class Pixy extends OscarCommon {
     }
 
     public enum CubePosition {
-        Right,
-        Left,
-        Center,
-        Unknown
+        RIGHT_CUBE,
+        LEFT_CUBE,
+        CENTER_CUBE,
+        UNKNOWN_CUBE
     }
 
     private static class PixyData {
@@ -62,6 +64,6 @@ public class Pixy extends OscarCommon {
         public static int y;
         public static int width;
         public static int height;
-        public static CubePosition cubePosition = CubePosition.Unknown;
+        public static CubePosition cubePosition;
     }
 }

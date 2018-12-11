@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.Base;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 public class Gyro extends OscarCommon {
     public static BNO055IMU.Parameters gyroParams;
     public static Orientation angles;
     public static Acceleration gravity;
+    public static AngularVelocity velocity;
 
     public static double TargetHeading = 0.0;
     public static double CurrentGyroHeading = 0.0;
@@ -42,6 +40,10 @@ public class Gyro extends OscarCommon {
         TargetHeading = CurrentGyroHeading;
     }
 
+    public static double getZRotationRate() {
+        return velocity.zRotationRate;
+    }
+
     protected static double getCompensation(boolean isTurning) {
         double rotation = 0.0;
         double gyro = CurrentGyroHeading;
@@ -67,6 +69,8 @@ public class Gyro extends OscarCommon {
 
     public static void update() {
         angles = Hardware.Sensors.imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
+        gravity = Hardware.Sensors.imu.getGravity();
+        velocity = Hardware.Sensors.imu.getAngularVelocity();
         CurrentGyroHeading = angles.firstAngle;
     }
 }
