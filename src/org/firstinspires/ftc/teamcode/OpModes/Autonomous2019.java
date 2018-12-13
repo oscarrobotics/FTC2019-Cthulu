@@ -1,13 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.Base.OscarBaseOp;
 import org.firstinspires.ftc.teamcode.Base.Pixy;
-import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
-import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
-
-import static org.firstinspires.ftc.teamcode.Base.Pixy.CubePosition.*;
-import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.State.*;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
 public class Autonomous2019 extends OscarBaseOp {
@@ -49,7 +43,7 @@ public class Autonomous2019 extends OscarBaseOp {
         STATE_TELEOP_INIT,
         STATE_STOP
     }
-
+    //code
     @Override
     public void start() {
         resetStartTime();

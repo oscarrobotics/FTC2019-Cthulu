@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.Base;
+package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
-import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
+import org.firstinspires.ftc.teamcode.Base.*;
+import org.firstinspires.ftc.teamcode.Mechanisms.*;
 
 public class OscarBaseOp extends OpMode {
 

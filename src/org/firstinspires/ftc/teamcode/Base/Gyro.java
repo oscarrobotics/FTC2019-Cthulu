@@ -12,6 +12,12 @@ public class Gyro extends OscarCommon {
     public static double TargetHeading = 0.0;
     public static double CurrentGyroHeading = 0.0;
 
+    public static final double kP = 0.05;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+
+    private static MiniPID gyroPid;
+
     public static boolean init(){
         try {
             // Set up the parameters with which we will use our IMU. Note that integration
@@ -27,6 +33,9 @@ public class Gyro extends OscarCommon {
             // Gyro stuff
             ////NEGATIVE = clockwise
             Hardware.Sensors.imu.initialize(gyroParams);
+
+            gyroPid = new MiniPID(kP, kI, kD);
+
             _telemetry.addLine("initialized");
         }
         catch (Exception ex) {
@@ -44,6 +53,10 @@ public class Gyro extends OscarCommon {
         return velocity.yRotationRate;
     }
 
+    public static double pidCompensation() {
+        return gyroPid.getOutput(CurrentGyroHeading, TargetHeading);
+    }
+
     protected static double getCompensation(boolean isTurning) {
         double rotation = 0.0;
         double gyro = CurrentGyroHeading;
@@ -53,6 +66,7 @@ public class Gyro extends OscarCommon {
         double minSpeed = isTurning?.45:.2; // was 0.12
         double maxSpeed = 1;
 
+
         if (Math.abs(posError) > 180) {
             posError = -360 * Math.signum(posError) + posError;
         }
@@ -60,6 +74,9 @@ public class Gyro extends OscarCommon {
             rotation = minSpeed + (Math.abs(posError) / 180) * (maxSpeed - minSpeed);
             rotation = rotation * Math.signum(posError);
         }
+
+        _telemetry.addData("Gyro Output", rotation);
+
         return -rotation;
     }
 
@@ -72,6 +89,6 @@ public class Gyro extends OscarCommon {
                 AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
         gravity = Hardware.Sensors.imu.getGravity();
         velocity = Hardware.Sensors.imu.getAngularVelocity();
-        CurrentGyroHeading = angles.firstAngle;
+        CurrentGyroHeading = angles.thirdAngle;
     }
 }

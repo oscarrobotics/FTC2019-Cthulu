@@ -8,18 +8,14 @@ public class NewMecanumDrive {
 
     private static DcMotor _frontLeft, _frontRight, _backLeft, _backRight;
 
-    private static double gyroMaxRotationRate = 0.0;
-    private static double gyroAssistKp = .1;
-    private static boolean gyroAssistEnabled = true;
-
     public static void init() {
         _frontLeft = Hardware.DriveMotors.frontLeft;
         _frontRight = Hardware.DriveMotors.frontRight;
         _backLeft = Hardware.DriveMotors.backLeft;
         _backRight = Hardware.DriveMotors.backRight;
 
-        _frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        _frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        _frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        _frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         _backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         _backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -43,67 +39,97 @@ public class NewMecanumDrive {
 
     }
 
-    public void enableGyroAssist(double gyroMaxRotationRate, double gyroAssistKp) {
-        this.gyroMaxRotationRate = gyroMaxRotationRate;
-        this.gyroAssistKp = gyroAssistKp;
-        this.gyroAssistEnabled = true;
+    protected static void holonomicDrive(double speed, double direction, double rotation, boolean gyroComp) {
+//        speed = Util.clipRange(speed);
+//        direction = Util.clipRange(direction);
+//        rotation = Util.clipRange(rotation);
+
+//        if (Math.abs(rotation) <= .1)
+//        {
+//            rotation = Gyro.pidCompensation();
+//        } else {
+//            Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+//        }
+
+        final double v1 = speed * Math.cos(direction) + rotation;
+        final double v2 = speed * Math.sin(direction) - rotation;
+        final double v3 = speed * Math.sin(direction) + rotation;
+        final double v4 = speed * Math.cos(direction) - rotation;
+
+        _frontLeft.setPower(v1);
+        _frontRight.setPower(v2);
+        _backLeft.setPower(v3);
+        _backRight.setPower(v4);
     }
 
-    public void disableGyroAssist() {
-        this.gyroMaxRotationRate = 0.0;
-        this.gyroAssistKp = 1.0;
-        this.gyroAssistEnabled = false;
+
+    /**
+     * Drive method for Mecanum platform.
+     *
+     * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
+     * from its angle or rotation rate.
+     *
+     * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+     * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+     * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+     *                  positive.
+     * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use
+     *                  this to implement field-oriented controls.
+     */
+    @SuppressWarnings("ParameterName")
+    public static void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
+
+    //        ySpeed = limit(ySpeed);
+    //        ySpeed = applyDeadband(ySpeed, m_deadband);
+    //        xSpeed = limit(xSpeed);
+    //        xSpeed = applyDeadband(xSpeed, m_deadband);
+
+        // Compensate for gyro angle.
+        Vector2d input = new Vector2d(ySpeed, xSpeed);
+        input.rotate(-gyroAngle);
+
+        double[] wheelSpeeds = new double[4];
+        double frontLeftPow = input.x + input.y + zRotation;
+        double frontRightPow= input.x - input.y + zRotation;
+        double backLeftPow = -input.x + input.y + zRotation;
+        double backRightPow = -input.x - input.y + zRotation;
+
+        Util.normalize(wheelSpeeds);
+
+        _frontLeft.setPower(frontLeftPow);
+        _frontRight.setPower(frontRightPow);
+        _backLeft.setPower(backLeftPow);
+        _backRight.setPower(backRightPow);
     }
 
-    public static boolean isGyroAssistEnabled() {
-        return gyroAssistEnabled;
-    }
-
-    public static double getGyroAssistPower(double rotation) {
-        double error = rotation - Gyro.getZRotationRate()/gyroMaxRotationRate;
-        return gyroAssistEnabled? Util.clipRange(gyroAssistKp*error): 0.0;
-    }
-
-    protected static void holonomicDrive(double x, double y, double rotation, boolean inverted, double gyroAngle) {
-        x = Util.clipRange(x);
-        y = Util.clipRange(y);
-        rotation = Util.clipRange(rotation);
-
-        if (inverted) {
-            x = -x;
-            y =-y;
-        }
-
-        double cosA = Math.cos(Math.toRadians(gyroAngle));
-        double sinA = Math.sin(Math.toRadians(gyroAngle));
-        double x1 = x*cosA - y*sinA;
-        double y1 = x*sinA + y*cosA;
-
-        if (isGyroAssistEnabled())
-        {
-            rotation += getGyroAssistPower(rotation);
-        }
-
-        double[] wheelPowers = new double[4];
-        wheelPowers[0] = x1 + y1 + rotation;
-        wheelPowers[1] = -x1 + y1 - rotation;
-        wheelPowers[2] = -x1 + y1 + rotation;
-        wheelPowers[3] = x1 + y1 - rotation;
-        Util.normalizeInPlace(wheelPowers);
-
-        _frontLeft.setPower(wheelPowers[0]);
-        _frontRight.setPower(wheelPowers[1]);
-        _backLeft.setPower(wheelPowers[2]);
-        _backRight.setPower(wheelPowers[3]);
+    /**
+     * Drive method for Mecanum platform.
+     *
+     * <p>Angles are measured counter-clockwise from straight ahead. The speed at which the robot
+     * drives (translation) is independent from its angle or rotation rate.
+     *
+     * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is positive.
+     * @param angle     The angle around the Z axis at which the robot drives in degrees [-180..180].
+     * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+     *                  positive.
+     */
+    @SuppressWarnings("ParameterName")
+    public static void drivePolar(double magnitude, double angle, double zRotation) {
+        driveCartesian(magnitude * Math.sin(angle * (Math.PI / 180.0)),
+                magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
     }
 
     public static void teleopControl(Gamepad gamepad) {
 
         double rotateStick = Math.pow(gamepad.left_stick_x, 3);
         double rightStickX = gamepad.right_stick_x;
-        double rightStickY = gamepad.right_stick_y;
+        double rightStickY = -gamepad.right_stick_y;
 
-        // TODO: Test this!
-        holonomicDrive(rightStickX, rightStickY, rotateStick, true, Gyro.CurrentGyroHeading);
+        driveCartesian(rightStickX, rightStickY, rotateStick, Gyro.CurrentGyroHeading);
+
+//        double speed = Math.hypot(rightStickX, rightStickY);
+//        double direction = Math.atan2(rightStickY, -rightStickX) - Math.PI / 4;
+//
+//        holonomicDrive(speed, direction, rotateStick, false);
     }
 }

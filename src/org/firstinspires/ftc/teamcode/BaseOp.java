@@ -11,20 +11,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.*;
 import java.util.Locale;
 
 public class BaseOp extends OpMode {
-  
+
   /**
    * To Do List:
-   * 
    *
-   * 
+   *
+   *
    **/
-  
-  
-    
+
+
+
     // imus
     BNO055IMU imu;
 
-    
+
     // Motors
     public DcMotor rightFront;
     public DcMotor leftFront;
@@ -34,20 +34,20 @@ public class BaseOp extends OpMode {
     public DcMotor intakeCollect;
     public DcMotor intakeArmVertical;
     public DcMotor intakeArmExtend;
-    
+
     //Servos
     public Servo dumpServo;
 
-    
+
     // Gyro
     BNO055IMU.Parameters gyroParams;
     Orientation angles;
     Acceleration gravity;
-    
+
     // Sensors
     public I2cDeviceSynch pixyCam;
     DigitalChannel limitSwitch;
-    
+
     // Variables
     public boolean isLeftHandDrive = false;
     double lastKnownRotJoy = 0.0;
@@ -64,11 +64,11 @@ public class BaseOp extends OpMode {
     public double dumpOpenPosition = 0.1;
     public double dumpInit = 0.95;
     public int elevatorTargetPosition = 0;
-    
+
     //Pixy
     public double pixyX, pixyY, pixyWidth, pixyHeight, numObjects;
     public byte[] pixyData;
-    
+
     // Mecanum Variables
     double speed = 0;
     // double lastSpeed = 0;
@@ -77,9 +77,9 @@ public class BaseOp extends OpMode {
     int target = 0;
     int targetDestination = 0;
 
-    
 
-    
+
+
     public double forwardMove(double speed) {
         return Math.atan2(speed, 0) - Math.PI / 4;
     }
@@ -95,9 +95,9 @@ public class BaseOp extends OpMode {
     public double leftMove(double speed) {
         return Math.atan2(0, speed) - Math.PI / 4;
     }
-    
+
     public void gyroInit(){
-        
+
         // Set up the parameters with which we will use our IMU. Note that integration
         // algorithm here just reports accelerations to the logcat log; it doesn't actually
         // provide positional information.
@@ -108,7 +108,7 @@ public class BaseOp extends OpMode {
          gyroParams.loggingEnabled      = true;
          gyroParams.loggingTag          = "IMU";
      }
-    
+
     public void zeroEncoders() {
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -118,100 +118,100 @@ public class BaseOp extends OpMode {
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        
+
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeArmExtend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeArmExtend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeArmVertical.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeArmVertical.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        
+
         limitSwitch.setMode(DigitalChannel.Mode.INPUT);
     }
 
     public double leftAndBack(double speed) {return Math.atan2((0.25*speed), speed) - Math.PI / 4;}
-  
+
     public void init() {
         telemetry.addLine("Start of init");
-        
-        
-        
+
+
+
         // Motor block
         rightFront = hardwareMap.dcMotor.get("rightFront");
-        
+
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightBack = hardwareMap.dcMotor.get("rightBack");
-        
+
         rightBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFront = hardwareMap.dcMotor.get("leftFront");
-        
+
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftBack = hardwareMap.dcMotor.get("leftBack");
-        
+
         leftBack.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
+
         elevator = hardwareMap.dcMotor.get("elevator");
-        
+
         elevator.setDirection(DcMotor.Direction.FORWARD);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
+
         intakeCollect = hardwareMap.dcMotor.get("intakeCollect");
-        
+
         intakeCollect.setDirection(DcMotor.Direction.FORWARD);
         intakeCollect.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);//FLOAT
-        
+
         intakeArmVertical = hardwareMap.dcMotor.get("intakeArmVertical");
-        
+
         intakeArmVertical.setDirection(DcMotor.Direction.FORWARD);
         intakeArmVertical.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
+
         intakeArmExtend = hardwareMap.dcMotor.get("intakeArmExtend");
 
         intakeArmExtend.setDirection(DcMotor.Direction.FORWARD);
         intakeArmExtend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
+
         limitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
 
         zeroEncoders();
 
         //servos
-              
+
         dumpServo = hardwareMap.servo.get("dumpServo");
         dumpServo.setPosition(dumpInit);
-        
-        
+
+
         //sensors
         pixyCam = hardwareMap.i2cDeviceSynch.get("pixy");
         pixyCam.engage();
- 
-        
+
+
         // Gyro stuff
         ////NEGATIVE = clockwise
         gyroInit();
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(gyroParams);
-        
+
         telemetry.addLine("initialized");
     }
-    
+
     @Override
     public void init_loop() { // runs after pressing INIT and loops until START pressed
         super.init_loop();
-        
+
     }
 
     public void loop() { // constantly running code
-    
+
         angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         //telemetry.addData("5","Gyro heading:",angles.firstAngle);
-        currentGyroHeading = angles.firstAngle; 
+        currentGyroHeading = angles.firstAngle;
         telemetry.update();
         telemetry.addLine("Elevator Position: " + elevator.getCurrentPosition());
     }
@@ -349,11 +349,11 @@ public class BaseOp extends OpMode {
     {
         return rotationComp(false);
     }
-    
+
     String formatAngle(AngleUnit angleUnit, double angle) {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
-    
+
     String formatDegrees(double degrees){
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
