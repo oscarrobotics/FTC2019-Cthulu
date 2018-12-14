@@ -124,6 +124,8 @@ public class Arm extends OscarCommon {
          } else {
              _intakeCollect.setPower(0.0);
          }
+
+        dumpMineral(gamepad.left_bumper);
     }
 
     public static void score() {

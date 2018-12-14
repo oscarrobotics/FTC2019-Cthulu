@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.Base.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Base.NewMecanumDrive;
 import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
@@ -10,6 +11,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name = "TeleOp2019", group="Iterative Opmode")
 
 public class TeleOp2019 extends OscarBaseOp {
+
+    private static Gamepad lastGamepad1 = new Gamepad();
+    private static Gamepad lastGamepad2 = new Gamepad();
 
     private boolean autoEnabled = false;
 
@@ -37,10 +41,10 @@ public class TeleOp2019 extends OscarBaseOp {
     public void loop() {
         super.loop();
 
-        NewMecanumDrive.teleopControl(gamepad1);
+        NewMecanumDrive.teleopControl(gamepad1, lastGamepad1);
         Lift.teleopControl(gamepad2);
         Arm.teleopControl(gamepad2);
-        DumpControl();
+
         telemetry.addLine("Arm Vertical target " + Arm.getVerticalTargetPos());
         telemetry.addLine("Arm Vertical actual   " + Arm.getVerticalPos());
         telemetry.addLine("Arm Horizontal Target: " + Arm.getHorizontalPos());
@@ -48,9 +52,11 @@ public class TeleOp2019 extends OscarBaseOp {
         telemetry.addLine("Elevator Target: " + Lift.getTargetPos());
         telemetry.addLine("Elevator Actual: " + Lift.getTargetPos());
         //telemetry.addLine("Dump Servo " );
-    }
 
-    public void DumpControl(){
-        Arm.dumpMineral(gamepad2.left_bumper);
+
+        try {
+            lastGamepad1.copy(gamepad1);
+            lastGamepad2.copy(gamepad2);
+        } catch(Exception ex) {}
     }
 }

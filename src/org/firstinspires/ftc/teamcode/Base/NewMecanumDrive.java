@@ -4,9 +4,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class NewMecanumDrive {
+public class NewMecanumDrive extends OscarCommon{
 
     private static DcMotor _frontLeft, _frontRight, _backLeft, _backRight;
+
+    public static boolean isFieldOriented;
 
     public static void init() {
         _frontLeft = Hardware.DriveMotors.frontLeft;
@@ -39,30 +41,6 @@ public class NewMecanumDrive {
 
     }
 
-    protected static void holonomicDrive(double speed, double direction, double rotation, boolean gyroComp) {
-//        speed = Util.clipRange(speed);
-//        direction = Util.clipRange(direction);
-//        rotation = Util.clipRange(rotation);
-
-//        if (Math.abs(rotation) <= .1)
-//        {
-//            rotation = Gyro.pidCompensation();
-//        } else {
-//            Gyro.TargetHeading = Gyro.CurrentGyroHeading;
-//        }
-
-        final double v1 = speed * Math.cos(direction) + rotation;
-        final double v2 = speed * Math.sin(direction) - rotation;
-        final double v3 = speed * Math.sin(direction) + rotation;
-        final double v4 = speed * Math.cos(direction) - rotation;
-
-        _frontLeft.setPower(v1);
-        _frontRight.setPower(v2);
-        _backLeft.setPower(v3);
-        _backRight.setPower(v4);
-    }
-
-
     /**
      * Drive method for Mecanum platform.
      *
@@ -76,8 +54,7 @@ public class NewMecanumDrive {
      * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use
      *                  this to implement field-oriented controls.
      */
-    @SuppressWarnings("ParameterName")
-    public static void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
+    private static void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
 
     //        ySpeed = limit(ySpeed);
     //        ySpeed = applyDeadband(ySpeed, m_deadband);
@@ -119,17 +96,24 @@ public class NewMecanumDrive {
                 magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
     }
 
-    public static void teleopControl(Gamepad gamepad) {
+//    public static void teleopControl(Gamepad gamepad) {
+//        double rotateStick = Math.pow(gamepad.left_stick_x, 3);
+//        double rightStickX = gamepad.right_stick_x;
+//        double rightStickY = -gamepad.right_stick_y;
+//
+//        driveCartesian(rightStickX, rightStickY, rotateStick, Gyro.CurrentGyroHeading);
+//    }
 
+    public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
         double rotateStick = Math.pow(gamepad.left_stick_x, 3);
         double rightStickX = gamepad.right_stick_x;
         double rightStickY = -gamepad.right_stick_y;
 
-        driveCartesian(rightStickX, rightStickY, rotateStick, Gyro.CurrentGyroHeading);
-
-//        double speed = Math.hypot(rightStickX, rightStickY);
-//        double direction = Math.atan2(rightStickY, -rightStickX) - Math.PI / 4;
-//
-//        holonomicDrive(speed, direction, rotateStick, false);
+        if (gamepad.y != lastGamepad.y) {
+            Gyro.zero();
+            isFieldOriented = !isFieldOriented;
+        }
+        _telemetry.addData("FieldOriented", isFieldOriented);
+        driveCartesian(rightStickX, rightStickY, rotateStick, isFieldOriented ? Gyro.CurrentGyroHeading : 0.0);
     }
 }
