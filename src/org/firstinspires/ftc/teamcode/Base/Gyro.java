@@ -11,10 +11,12 @@ public class Gyro extends OscarCommon {
 
     public static double TargetHeading = 0.0;
     public static double CurrentGyroHeading = 0.0;
+    public static double LastGyroHeading = 0.0;
 
-    public static final double kP = 0.05;
+    public static final double kP = 0.003;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
+    private static final double kEpsilon = 1;
 
     private static MiniPID gyroPid;
 
@@ -35,6 +37,7 @@ public class Gyro extends OscarCommon {
             Hardware.Sensors.imu.initialize(gyroParams);
 
             gyroPid = new MiniPID(kP, kI, kD);
+            gyroPid.setOutputLimits(-1.0, 1.0);
 
             _telemetry.addLine("initialized");
         }
@@ -51,6 +54,10 @@ public class Gyro extends OscarCommon {
 
     public static double getZRotationRate() {
         return velocity.yRotationRate;
+    }
+
+    public static void setPidSetpoint(int degree) {
+        TargetHeading = degree;
     }
 
     public static double pidCompensation() {

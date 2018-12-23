@@ -5,10 +5,6 @@ import com.qualcomm.robotcore.hardware.*;
 
 public class Hardware extends OscarCommon {
 
-    public static class Setpoints {
-        public static double dumpServoInit = 0.95;
-    }
-
     public static class DriveMotors {
         // Drive Motors
         public static DcMotor frontLeft;
@@ -53,7 +49,6 @@ public class Hardware extends OscarCommon {
 
         // Servos
         Servos.dumpServo = hardwareMap.servo.get("dumpServo");
-        Servos.dumpServo.setPosition(Setpoints.dumpServoInit);
 
         // Sensors
         Sensors.pixyCam = hardwareMap.i2cDeviceSynch.get("pixy");

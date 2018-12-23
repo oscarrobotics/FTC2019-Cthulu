@@ -16,22 +16,22 @@ public class Arm extends OscarCommon {
 
     private static int armXTargetPos, armYTargetPos;
 
-    private static final double DUMP_OPEN = .7;
-    private static final double DUMP_CLOSE = .2;
+    private static final double DUMP_OPEN = .15;
+    private static final double DUMP_CLOSE = .85;
 
     // extension values
     private static final int ARM_X_MAX = 3000;
     private static final int ARM_X_MIN = 3000;
     private static final int ARM_X_SCORE = 2800;
     private static final int ARM_X_PARALLEL = 1350;
-    private static final int ARM_X_INCREMENT = 20;
+    private static final int ARM_X_INCREMENT = 30;
 
     // rotation values
     private static final int ARM_Y_POSITIONPARALLEL = 100;
     private static final int ARM_Y_POSITIONSCORE = 2750;
     private static final int ARM_Y_MAX = 2850;
     private static final int ARM_Y_MIN = 2850;
-    private static final int ARM_Y_INCREMENT = 20;
+    private static final int ARM_Y_INCREMENT = 30;
 
     public static void init() {
         _intakeCollect = Hardware.MechanismMotors.intakeCollect;
@@ -47,6 +47,7 @@ public class Arm extends OscarCommon {
         _intakeArmVertical.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         _dumpServo = Hardware.Servos.dumpServo;
+        _dumpServo.setPosition(DUMP_CLOSE);
     }
 
     public static void zeroEncoders() {

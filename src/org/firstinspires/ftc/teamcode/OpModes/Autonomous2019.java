@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.Base.NewMecanumDrive;
 import org.firstinspires.ftc.teamcode.Base.Pixy;
+import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
 public class Autonomous2019 extends OscarBaseOp {
@@ -81,7 +83,7 @@ public class Autonomous2019 extends OscarBaseOp {
     public void loop() {
         super.loop();
 
-        /*
+
         telemetry.addLine("STATE: " + mCurrentState);
         switch (mCurrentState) {
             case STATE_INITIAL:
@@ -98,43 +100,33 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_DETACH_LANDER:
                 speed = .3;
-                if (MecanumDrive(speed, forwardMove(speed), 0, 100)){
-                    newState(STATE_STRAFE_RIGHT);
-                    MecanumDrive(0, 0, 0, 0);
-                }
+                NewMecanumDrive.forward(speed, 100);
+                newState(STATE_STRAFE_RIGHT);
                 break;
 
             case STATE_STRAFE_RIGHT:
                 speed = .7;
-                if (MecanumDrive(speed, rightMove(speed), 0, 200)){
-                    MecanumDrive(0, 0, 0, 0);
-                    newState(STATE_CLEAR_LANDER);
-                }
+                NewMecanumDrive.right(speed, 200);
+                newState(STATE_CLEAR_LANDER);
                 break;
 
             case STATE_CLEAR_LANDER:
                 speed = .3;
-                if (MecanumDrive(speed, forwardMove(speed), 0, 450)){
+                NewMecanumDrive.forward(speed, 450);
                     newState(STATE_LINEUP);
-                    MecanumDrive(0, 0, 0, 0);
-                }
                 break;
 
             case STATE_LINEUP:
                 speed = .7;
-                if (MecanumDrive(speed, rightMove(speed), 0, 1400)){
+                NewMecanumDrive.right(speed, 1400);
                     Lift.runToBottom();
                     newState(STATE_BACK);
-                    MecanumDrive(0, 0, 0, 0);
-                }
                 break;
 
             case STATE_BACK:
                 speed = .25;
-                if (MecanumDrive(speed, forwardMove(speed), 0, 900)){
-                    newState(STATE_SCAN_MINERALS);
-                    MecanumDrive(0, 0, 0, 0);
-                }
+                NewMecanumDrive.forward(speed, 900);
+                newState(STATE_SCAN_MINERALS);
                 break;
 
             case STATE_SCAN_MINERALS:
@@ -142,17 +134,25 @@ public class Autonomous2019 extends OscarBaseOp {
 
                 switch (Pixy.getCubePosition()) {
                     case LEFT_CUBE:
+                        distance = 2350;
+                        depotAngle = 110;
+                        strafeDistance = 600;
+                        NewMecanumDrive.backward(speed, distance);
+                        if (lander == StartPosition.Depot)
+                            newState(STATE_TURN_TO_DEPOT);
+                        else
+                            newState(STATE_HIT_CUBE);
+                        break;
+                        
                     case UNKNOWN_CUBE:
                         distance = 2350;
                         depotAngle = 110;
                         strafeDistance = 600;
-                        if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
-                            if (lander == StartPosition.Depot){
-                                newState(STATE_TURN_TO_DEPOT);
-                            } else
-                                newState(STATE_TURN_TO_DEPOT);//STATE_HIT_CUBE
-                            MecanumDrive(0, 0, 0, 0);
-                        }
+                        NewMecanumDrive.backward(speed, distance);
+                        if (lander == StartPosition.Depot)
+                            newState(STATE_TURN_TO_DEPOT);
+                        else
+                            newState(STATE_HIT_CUBE);
                         break;
 
                     case CENTER_CUBE:
@@ -289,7 +289,7 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
 
-         /*  case STATE_TELEOP_INIT:
+           case STATE_TELEOP_INIT:
              MecanumDrive(0, 0, 0, 0);
              intakeArmExtend.setTargetPosition(-700);
              newState(STATE_STOP);
@@ -300,7 +300,7 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
         }
-        */
+
 
     }
 
