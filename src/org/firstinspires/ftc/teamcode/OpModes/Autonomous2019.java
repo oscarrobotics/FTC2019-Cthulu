@@ -143,7 +143,7 @@ public class Autonomous2019 extends OscarBaseOp {
                         else
                             newState(STATE_HIT_CUBE);
                         break;
-                        
+
                     case UNKNOWN_CUBE:
                         distance = 2350;
                         depotAngle = 110;
