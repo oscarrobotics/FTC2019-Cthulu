@@ -3,7 +3,10 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Base.NewMecanumDrive;
 import org.firstinspires.ftc.teamcode.Base.Pixy;
+import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
+
+import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.State.*;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
 public class Autonomous2019 extends OscarBaseOp {
@@ -15,6 +18,18 @@ public class Autonomous2019 extends OscarBaseOp {
     private int strafeDistance;
     private StartPosition lander = StartPosition.Depot;
 
+    private int LEFT_CUBE_DISTANCE = 2350;
+    private int LEFT_CUBE_ANGLE = 110;
+    private int LEFT_CUBE_STRAFE = 600;
+
+    private int CENTER_CUBE_DISTANCE = 1050;
+    private int CENTER_CUBE_ANGLE = 90;
+    private int CENTER_CUBE_STRAFE = 1400;
+
+    private int RIGHT_CUBE_DISTANCE = 1;
+    private int RIGHT_CUBE_ANGLE = 70;
+    private int RIGHT_CUBE_STRAFE = 2000;
+
     public enum StartPosition {
         Crater,
         Depot,
@@ -23,7 +38,15 @@ public class Autonomous2019 extends OscarBaseOp {
     private ElapsedTime mStateTime = new ElapsedTime();  // Time into current state
     private State mCurrentState;
 
-    public enum State { // Ideally, these stay in order of how we use them
+    private void newState(State newState){
+        // Reset the state time, and then change to next state.
+        mStateTime.reset();
+        mCurrentState = newState;
+        telemetry.addData("State", mCurrentState);
+        stateCounter++;
+    }
+
+    public static enum State { // Ideally, these stay in order of how we use them
         STATE_INITIAL,
         STATE_DROP,
         STATE_DETACH_LANDER,
@@ -92,8 +115,8 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_DROP:
-                Lift.setPosition(2*2100);
-                if(Math.abs(Lift.getTargetPos() - Lift.getCurrentPos()) <= 20){
+                Lift.setPosition(2 * 2100);
+                if (Math.abs(Lift.getTargetPos() - Lift.getCurrentPos()) <= 20) {
                     newState(STATE_DETACH_LANDER);
                 }
                 break;
@@ -113,14 +136,14 @@ public class Autonomous2019 extends OscarBaseOp {
             case STATE_CLEAR_LANDER:
                 speed = .3;
                 NewMecanumDrive.forward(speed, 450);
-                    newState(STATE_LINEUP);
+                newState(STATE_LINEUP);
                 break;
 
             case STATE_LINEUP:
                 speed = .7;
                 NewMecanumDrive.right(speed, 1400);
-                    Lift.runToBottom();
-                    newState(STATE_BACK);
+                Lift.runToBottom();
+                newState(STATE_BACK);
                 break;
 
             case STATE_BACK:
@@ -156,40 +179,22 @@ public class Autonomous2019 extends OscarBaseOp {
                         break;
 
                     case CENTER_CUBE:
+                        NewMecanumDrive.backward(speed, distance);
+                        if (lander == StartPosition.Depot)
+                            newState(STATE_TURN_TO_DEPOT);
+                        else
+                            newState(STATE_HIT_CUBE);
                         break;
+
                     case RIGHT_CUBE:
+                        NewMecanumDrive.backward(speed, distance);
+                        if (lander == StartPosition.Depot)
+                            newState(STATE_TURN_TO_DEPOT);
+                        else
+                            newState(STATE_HIT_CUBE);
                         break;
                 }
-
-                if (Pixy.getCubePosition() == LEFT_CUBE || Pixy.getCubePosition() == UNKNOWN_CUBE){
-
-                }
-                else if (Pixy.getCubePosition() == CENTER_CUBE){
-                    distance = 1050;
-                    depotAngle = 90;
-                    strafeDistance = 1400;
-                    if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
-                        if (lander == StartPosition.Depot){
-                            newState(STATE_TURN_TO_DEPOT);
-                        } else
-                            newState(STATE_TURN_TO_DEPOT);//STATE_HIT_CUBE
-                        MecanumDrive(0, 0, 0, 0);
-                    }
-                }
-                else if (Pixy.getCubePosition() == RIGHT_CUBE){
-                    distance = 1;
-                    depotAngle = 70;
-                    strafeDistance = 2000;
-                    if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
-                        if (lander == StartPosition.Depot){
-                            newState(STATE_TURN_TO_DEPOT);
-                        } else
-                            newState(STATE_TURN_TO_DEPOT);;//STATE_HIT_CUBE
-                        MecanumDrive(0, 0, 0, 0);
-                    }
-                }
-                break;
-
+/*
             case STATE_HIT_CUBE:
                 speed = .7;
                 if (MecanumDrive(speed, rightMove(speed), 0, 400)){
@@ -199,7 +204,7 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_TURN_TO_DEPOT:
-                speed = 0.0;
+                speed *& 0.0;
                 targetHeading = -depotAngle;
                 if (MecanumDrive(speed, 0, rotationComp(), 0)){
                     newState(STATE_DRIVE_TO_DEPOT);
@@ -226,7 +231,6 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_DROP_MARKER:
-
                 if (mStateTime.milliseconds() >= 3000){
                     Arm.succ(0);
                 } else {
@@ -300,16 +304,8 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
         }
+        */
 
-
+        }
     }
-
-    private void newState(State newState) {
-        // Reset the state time, and then change to next state.
-        mStateTime.reset();
-        mCurrentState = newState;
-        telemetry.addData("State", mCurrentState);
-        stateCounter++;
-    }
-
 }

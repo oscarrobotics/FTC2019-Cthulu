@@ -115,7 +115,7 @@ public class NewMecanumDrive extends OscarCommon{
 
         double rotateValue = 0;
 
-        if (gamepad.y != lastGamepad.y) {
+        if (gamepad.y && !lastGamepad.y) {
             Gyro.zero();
             isFieldOriented = !isFieldOriented;
         }
@@ -149,88 +149,76 @@ public class NewMecanumDrive extends OscarCommon{
 
         if (gamepad.dpad_up || gamepad.dpad_down || gamepad.dpad_left || gamepad.dpad_right) {
             if (gamepad.dpad_down) { // backwards
-                backward(gamepad.right_bumper ? .5 : 0.3);
+                backward(gamepad.right_bumper ? .25 : 0.4);
             } else if (gamepad.dpad_left) { // left
-                left(gamepad.right_bumper ? .5 : 0.3);
+                left(gamepad.right_bumper ? .25 : 0.4);
             } else if (gamepad.dpad_up) { // forwards
-                forward(gamepad.right_bumper ? .5 : 0.3);
+                forward(gamepad.right_bumper ? .25 : 0.4);
             } else { // right
-                right(gamepad.right_bumper ? .5 : 0.3);
+                right(gamepad.right_bumper ? .25 : 0.4);
             }
         } else {
-            driveCartesian(rightStickY, rightStickX, rotateValue, fieldAngle());
+            driveCartesian(rightStickX, rightStickY, rotateValue, fieldAngle());
         }
         _telemetry.addData("FieldOriented", isFieldOriented);
     }
 
     public static void forward(double power){
-        driveCartesian(power, 0, 0, fieldAngle());
+        driveCartesian(0, power, 0, fieldAngle());
     }
 
     public static void backward(double power){
-        driveCartesian(-power, 0, 0, fieldAngle());
+        driveCartesian(0, -power, 0, fieldAngle());
     }
 
     public static void right(double power){
-        driveCartesian(0, power, 0, fieldAngle());
+        driveCartesian(power, 0, 0, fieldAngle());
     }
 
     public static void left(double power){
-        driveCartesian(0, -power, 0, fieldAngle());
+        driveCartesian(-power, 0, 0, fieldAngle());
     }
 
-    public static void forward(double power, int distance){
+    public static boolean forward(double power, int distance){
         driveCartesian(0, power, 0, fieldAngle());
 
         int startPos = _backLeft.getCurrentPosition();
         int targetPos = startPos + distance;
-        while (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) {
-            updateTelemetry(targetPos);
-            if (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) break;
-        }
-        stop();
+        return atTarget(targetPos);
     }
 
-    public static void backward(double power, int distance){
+    public static boolean backward(double power, int distance){
         driveCartesian(0, -power, 0, fieldAngle());
 
         int startPos = _backLeft.getCurrentPosition();
         int targetPos = startPos + distance;
-        while (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) {
-            updateTelemetry(targetPos);
-            if (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) break;
-        }
-        stop();
+        return atTarget(targetPos);
     }
 
-    public static void right(double power, int distance){
+    public static boolean right(double power, int distance){
         driveCartesian(power, 0, 0, fieldAngle());
 
         int startPos = _backLeft.getCurrentPosition();
         int targetPos = startPos + distance;
-        while (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) {
-            updateTelemetry(targetPos);
-            if (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) break;
-        }
-        stop();
+        return atTarget(targetPos);
     }
 
-    public static void left(double power, int distance){
+    public static boolean left(double power, int distance){
         driveCartesian(-power, 0, 0, fieldAngle());
 
         int startPos = _backLeft.getCurrentPosition();
         int targetPos = startPos + distance;
-        while (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) {
-            updateTelemetry(targetPos);
-            if (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE) break;
-        }
-        stop();
+        return atTarget(targetPos);
     }
 
     public static void updateTelemetry(int targetPos) {
         _telemetry.addLine()
                 .addData("Actual", _backLeft.getCurrentPosition())
                 .addData("Dest", targetPos);
+    }
+
+    private static boolean atTarget(int targetPos) {
+        return (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE);
     }
 
     public static void stop() {

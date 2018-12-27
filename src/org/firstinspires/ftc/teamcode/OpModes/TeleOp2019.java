@@ -43,12 +43,8 @@ public class TeleOp2019 extends OscarBaseOp {
 
         NewMecanumDrive.teleopControl(gamepad1, lastGamepad1);
         Lift.teleopControl(gamepad2);
-        Arm.teleopControl(gamepad2);
+        Arm.teleopControl(gamepad2, lastGamepad2);
 
-        telemetry.addLine("Arm Vertical target " + Arm.getVerticalTargetPos());
-        telemetry.addLine("Arm Vertical actual   " + Arm.getVerticalPos());
-        telemetry.addLine("Arm Horizontal Target: " + Arm.getHorizontalPos());
-        telemetry.addLine("Arm Horizontal Actual: " + Arm.getHorizontalPos());
         telemetry.addLine("Elevator Target: " + Lift.getTargetPos());
         telemetry.addLine("Elevator Actual: " + Lift.getTargetPos());
         //telemetry.addLine("Dump Servo " );

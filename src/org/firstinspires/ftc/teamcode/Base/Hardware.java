@@ -56,7 +56,7 @@ public class Hardware extends OscarCommon {
         Sensors.imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         Sensors.armLimitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
-        Sensors.armLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
+
         _telemetry.addData("HARDWARE", "INIT");
     }
 }
