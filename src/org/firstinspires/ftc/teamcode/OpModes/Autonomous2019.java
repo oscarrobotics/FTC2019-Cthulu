@@ -18,16 +18,16 @@ public class Autonomous2019 extends OscarBaseOp {
     private int strafeDistance;
     private StartPosition lander = StartPosition.Depot;
 
-    private int LEFT_CUBE_DISTANCE = 2350;
-    private int LEFT_CUBE_ANGLE = 110;
+    private int LEFT_CUBE_DISTANCE = 1400;
+    private int LEFT_CUBE_ANGLE = 105;
     private int LEFT_CUBE_STRAFE = 600;
 
-    private int CENTER_CUBE_DISTANCE = 1050;
+    private int CENTER_CUBE_DISTANCE = 200;
     private int CENTER_CUBE_ANGLE = 90;
     private int CENTER_CUBE_STRAFE = 1400;
 
-    private int RIGHT_CUBE_DISTANCE = 1;
-    private int RIGHT_CUBE_ANGLE = 70;
+    private int RIGHT_CUBE_DISTANCE = 1050;
+    private int RIGHT_CUBE_ANGLE = 75;
     private int RIGHT_CUBE_STRAFE = 2000;
 
     public enum StartPosition {
@@ -52,20 +52,23 @@ public class Autonomous2019 extends OscarBaseOp {
         STATE_DETACH_LANDER,
         STATE_STRAFE_RIGHT,
         STATE_CLEAR_LANDER,
-        STATE_LINEUP,
+        STATE_LINEUP_MINERALS,
         STATE_BACK,
-        STATE_SCAN_MINERALS,
-        STATE_HIT_CUBE,
+        STATE_HIT_MINERALS,
         STATE_TURN_TO_DEPOT,
         STATE_DRIVE_TO_DEPOT,
+        STATE_HIT_CUBE,
+        STATE_LINEUP_DEPOT,
+        STATE_TURN_TO_DEPOT_FROM_CRATER,
+        STATE_DRIVE_TO_DEPOT_FROM_CRATER,
         STATE_DROP_MARKER,
+        STATE_RETURN_TO_CRATER,
         STATE_TURN_TO_CRATER,
         STATE_STRAFE_TO_WALL,
         STATE_CLEAR_WALL,
         STATE_DRIVE_TO_CRATER,
         STATE_FLUSH_WALL,
         STATE_APPROACH_CRATER,
-        STATE_TELEOP_INIT,
         STATE_STOP
     }
     //code
@@ -123,112 +126,173 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_DETACH_LANDER:
                 speed = .3;
-                NewMecanumDrive.forward(speed, 100);
-                newState(STATE_STRAFE_RIGHT);
+                distance = 100;
+                if (NewMecanumDrive.forward(speed, distance)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_STRAFE_RIGHT);
+                }
                 break;
 
             case STATE_STRAFE_RIGHT:
                 speed = .7;
-                NewMecanumDrive.right(speed, 200);
-                newState(STATE_CLEAR_LANDER);
+                distance = 200;
+                if (NewMecanumDrive.right(speed, distance)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_CLEAR_LANDER);
+                }
                 break;
 
             case STATE_CLEAR_LANDER:
                 speed = .3;
-                NewMecanumDrive.forward(speed, 450);
-                newState(STATE_LINEUP);
+                distance = 450;
+                if (NewMecanumDrive.forward(speed, distance)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_LINEUP_MINERALS);
+                }
                 break;
 
-            case STATE_LINEUP:
+            case STATE_LINEUP_MINERALS:
                 speed = .7;
-                NewMecanumDrive.right(speed, 1400);
-                Lift.runToBottom();
-                newState(STATE_BACK);
+                distance = 1400;
+                if (NewMecanumDrive.right(speed, distance)){
+                    Lift.runToBottom();
+                    NewMecanumDrive.stop();
+                    newState(STATE_BACK);
+                }
+
                 break;
 
             case STATE_BACK:
                 speed = .25;
-                NewMecanumDrive.forward(speed, 900);
-                newState(STATE_SCAN_MINERALS);
+                distance = 900;
+                if (NewMecanumDrive.backward(speed, distance)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_HIT_MINERALS);
+                }
                 break;
 
-            case STATE_SCAN_MINERALS:
+            case STATE_HIT_MINERALS:
                 speed = .4;
 
                 switch (Pixy.getCubePosition()) {
                     case LEFT_CUBE:
-                        distance = 2350;
-                        depotAngle = 110;
-                        strafeDistance = 600;
-                        NewMecanumDrive.backward(speed, distance);
-                        if (lander == StartPosition.Depot)
-                            newState(STATE_TURN_TO_DEPOT);
-                        else
-                            newState(STATE_HIT_CUBE);
+                        distance = LEFT_CUBE_DISTANCE;
+                        depotAngle = LEFT_CUBE_ANGLE;
+                        strafeDistance = LEFT_CUBE_STRAFE;
+                        if (NewMecanumDrive.forward(speed, distance)){
+                            NewMecanumDrive.stop();
+                            if (lander == StartPosition.Depot)
+                                newState(STATE_TURN_TO_DEPOT);
+                            else
+                                newState(STATE_HIT_CUBE);
+                        }
                         break;
 
                     case UNKNOWN_CUBE:
-                        distance = 2350;
-                        depotAngle = 110;
-                        strafeDistance = 600;
-                        NewMecanumDrive.backward(speed, distance);
-                        if (lander == StartPosition.Depot)
-                            newState(STATE_TURN_TO_DEPOT);
-                        else
-                            newState(STATE_HIT_CUBE);
+                        distance = LEFT_CUBE_DISTANCE;
+                        depotAngle = LEFT_CUBE_ANGLE;
+                        strafeDistance = LEFT_CUBE_STRAFE;
+                        if (NewMecanumDrive.forward(speed, distance)){
+                            NewMecanumDrive.stop();
+                            if (lander == StartPosition.Depot)
+                                newState(STATE_TURN_TO_DEPOT);
+                            else
+                                newState(STATE_HIT_CUBE);
+                        }
                         break;
 
                     case CENTER_CUBE:
-                        NewMecanumDrive.backward(speed, distance);
-                        if (lander == StartPosition.Depot)
-                            newState(STATE_TURN_TO_DEPOT);
-                        else
-                            newState(STATE_HIT_CUBE);
+                        distance = CENTER_CUBE_DISTANCE;
+                        depotAngle = CENTER_CUBE_ANGLE;
+                        strafeDistance = CENTER_CUBE_STRAFE;
+                        if (NewMecanumDrive.forward(speed, distance)){
+                            NewMecanumDrive.stop();
+                            if (lander == StartPosition.Depot)
+                                newState(STATE_TURN_TO_DEPOT);
+                            else
+                                newState(STATE_HIT_CUBE);
+                        }
                         break;
 
                     case RIGHT_CUBE:
-                        NewMecanumDrive.backward(speed, distance);
-                        if (lander == StartPosition.Depot)
-                            newState(STATE_TURN_TO_DEPOT);
-                        else
-                            newState(STATE_HIT_CUBE);
-                        break;
-                }
-/*
-            case STATE_HIT_CUBE:
-                speed = .7;
-                if (MecanumDrive(speed, rightMove(speed), 0, 400)){
-                    MecanumDrive(0, 0, 0, 0);
-                    newState(STATE_STOP);
+                        distance = RIGHT_CUBE_DISTANCE;
+                        depotAngle = RIGHT_CUBE_ANGLE;
+                        strafeDistance = RIGHT_CUBE_STRAFE;
+                        if (NewMecanumDrive.backward(speed, distance)){
+                            NewMecanumDrive.stop();
+                            if (lander == StartPosition.Depot)
+                                newState(STATE_TURN_TO_DEPOT);
+                            else
+                                newState(STATE_HIT_CUBE);
+                        }
                 }
                 break;
 
             case STATE_TURN_TO_DEPOT:
-                speed *& 0.0;
-                targetHeading = -depotAngle;
-                if (MecanumDrive(speed, 0, rotationComp(), 0)){
-                    newState(STATE_DRIVE_TO_DEPOT);
-                    MecanumDrive(0, 0, 0, 0);
-                }
+                speed = .0;
+//                targetHeading = -depotAngle;
+//                if (MecanumDrive(speed, 0, rotationComp(), 0)) {
+//                    MecanumDrive(0,0,0,0);
+//                }
+                NewMecanumDrive.stop();
+                newState(STATE_DRIVE_TO_DEPOT);
                 break;
 
             case STATE_DRIVE_TO_DEPOT:
                 if (lander == StartPosition.Depot){
                     distance = 2000;
                     speed = .5;
-                } else
+                } else {
                     speed = .25;
-                distance = 1000;
+                    distance = 1000;
+                }
 
-                if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
-                    if (lander == StartPosition.Depot){
+                if (NewMecanumDrive.forward(speed, distance)) {
+                    NewMecanumDrive.stop();
+                    if (lander == StartPosition.Depot) {
                         newState(STATE_DROP_MARKER);
-                    } else
-                        newState(STATE_STOP);
-                    MecanumDrive(0, 0, 0, 0);
-
+                    } else {
+                        newState(STATE_HIT_CUBE);
+                    }
                 }
                 break;
+
+            case STATE_HIT_CUBE:
+                speed = .75;
+                distance = 500;
+                if (NewMecanumDrive.right(speed, distance)) {
+                    NewMecanumDrive.stop();
+                }
+
+                if (NewMecanumDrive.left(speed, distance)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_LINEUP_DEPOT);
+                }
+                break;
+
+            case STATE_LINEUP_DEPOT:
+                speed = 0.5;
+                distance = 700;
+                if (NewMecanumDrive.forward(speed, distance)){
+                    newState(STATE_TURN_TO_DEPOT_FROM_CRATER);
+                }
+
+            case STATE_TURN_TO_DEPOT_FROM_CRATER:
+                speed = .0;
+//                targetHeading = -depotAngle;
+//                if (MecanumDrive(speed, 0, rotationComp(), 0)) {
+//                    MecanumDrive(0,0,0,0);
+//                }
+                NewMecanumDrive.stop();
+                newState(STATE_DRIVE_TO_DEPOT_FROM_CRATER);
+                break;
+
+            case STATE_DRIVE_TO_DEPOT_FROM_CRATER:
+                speed = 0.5;
+                distance = 2000;
+                if (NewMecanumDrive.forward(speed, distance)){
+                    newState(STATE_RETURN_TO_CRATER);
+                }
 
             case STATE_DROP_MARKER:
                 if (mStateTime.milliseconds() >= 3000){
@@ -241,70 +305,64 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_TURN_TO_CRATER:
                 speed = .0;
-                targetHeading = -135;
-                if (MecanumDrive(speed, 0, rotationComp(), 0)){
-                    newState(STATE_STRAFE_TO_WALL);
-                    MecanumDrive(0,0,0,0);
-
-                }
+//                targetHeading = -135;
+//                if (MecanumDrive(speed, 0, rotationComp(), 0)){
+//                    newState(STATE_STRAFE_TO_WALL);
+//                    MecanumDrive(0,0,0,0);
+//
+//                }
                 break;
 
             case STATE_STRAFE_TO_WALL:
                 speed = .5;
-                if (MecanumDrive(speed, leftMove(speed), 0, -strafeDistance)){
+                distance = 500;
+                if (NewMecanumDrive.left(speed, distance)) {
                     Arm.succ(0);
+                    NewMecanumDrive.stop();
                     newState(STATE_CLEAR_WALL);
-                    MecanumDrive(0, 0, 0, 0);
                 }
                 break;
 
             case STATE_CLEAR_WALL:
                 speed = .5;
-                if (MecanumDrive(speed, rightMove(speed), 0, 400)){
-                    intakeCollect.setPower(0.0);
+                if (NewMecanumDrive.right(speed, distance)) {
+                    Arm.succ(0);
+                    NewMecanumDrive.stop();
                     newState(STATE_DRIVE_TO_CRATER);
-                    MecanumDrive(0, 0, 0, 0);
                 }
                 break;
 
             case STATE_DRIVE_TO_CRATER:
                 speed = .5;
-                if (MecanumDrive(speed, forwardMove(speed), 0, 1000)){
-                    MecanumDrive(0, 0, 0, 0);
+                distance = 1000;
+                if (NewMecanumDrive.forward(speed, distance)) {
+                    NewMecanumDrive.stop();
                     newState(STATE_FLUSH_WALL);
                 }
                 break;
 
             case STATE_FLUSH_WALL:
                 speed = .5;
-                if (MecanumDrive(speed, leftMove(speed), 0, -600)){
-                    intakeCollect.setPower(0.0);
+                distance = 600;
+                if (NewMecanumDrive.left(speed, distance)) {
+                    Arm.succ(0.0);
+                    NewMecanumDrive.stop();
                     newState(STATE_APPROACH_CRATER);
-                    MecanumDrive(0, 0, 0, 0);
                 }
                 break;
 
             case STATE_APPROACH_CRATER:
                 speed = .3;
-                if (MecanumDrive(speed, forwardMove(speed), 0, 3000)){
-                    MecanumDrive(0, 0, 0, 0);
+                distance = 3000;
+                if (NewMecanumDrive.forward(speed, distance)) {
+                    NewMecanumDrive.stop();
                     newState(STATE_STOP);
                 }
                 break;
 
-
-           case STATE_TELEOP_INIT:
-             MecanumDrive(0, 0, 0, 0);
-             intakeArmExtend.setTargetPosition(-700);
-             newState(STATE_STOP);
-           break;
-
             case STATE_STOP:
-                MecanumDrive(0, 0, 0, 0);
+                NewMecanumDrive.stop();
                 break;
-
-        }
-        */
 
         }
     }

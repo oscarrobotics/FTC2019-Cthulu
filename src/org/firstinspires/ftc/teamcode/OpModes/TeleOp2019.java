@@ -15,8 +15,6 @@ public class TeleOp2019 extends OscarBaseOp {
     private static Gamepad lastGamepad1 = new Gamepad();
     private static Gamepad lastGamepad2 = new Gamepad();
 
-    private boolean autoEnabled = false;
-
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
@@ -31,10 +29,7 @@ public class TeleOp2019 extends OscarBaseOp {
 
     @Override
     public void start() {
-        autoEnabled = false;
-//        Hardware.MechanismMotors.elevator.setPower(.5);
-//        Hardware.MechanismMotors.intakeArmVertical.setPower(0.5);
-//        Hardware.MechanismMotors.intakeArmExtend.setPower(0.5);
+
     }
 
     @Override

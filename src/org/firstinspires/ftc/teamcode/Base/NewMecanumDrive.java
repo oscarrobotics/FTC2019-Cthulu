@@ -13,6 +13,9 @@ public class NewMecanumDrive extends OscarCommon{
 
     private static final int AUTO_MOVE_TOLERANCE = 100;
 
+    private static final double ROTATE_SPEED_MULTIPLIER = .5;
+    private static final double DRIVE_SPEED_MULTIPLIER = 1;
+
     public static void init() {
         _frontLeft = Hardware.DriveMotors.frontLeft;
         _frontRight = Hardware.DriveMotors.frontRight;
@@ -58,12 +61,6 @@ public class NewMecanumDrive extends OscarCommon{
      *                  this to implement field-oriented controls.
      */
     private static void driveCartesian(double xSpeed, double ySpeed, double zRotation, double gyroAngle) {
-
-    //        ySpeed = limit(ySpeed);
-    //        ySpeed = applyDeadband(ySpeed, m_deadband);
-    //        xSpeed = limit(xSpeed);
-    //        xSpeed = applyDeadband(xSpeed, m_deadband);
-
         // Compensate for gyro angle.
         Vector2d input = new Vector2d(xSpeed, ySpeed);
         input.rotate(-gyroAngle);
@@ -108,10 +105,10 @@ public class NewMecanumDrive extends OscarCommon{
 //    }
 
     public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
-        double rotateStick = Math.pow(gamepad.left_stick_x, 3);
+        double rotateStick = Math.pow(gamepad.left_stick_x, 3) * ROTATE_SPEED_MULTIPLIER;
         double lastRotateStick = gamepad.left_stick_x;
-        double rightStickX = gamepad.right_stick_x;
-        double rightStickY = -gamepad.right_stick_y;
+        double rightStickX = gamepad.right_stick_x * DRIVE_SPEED_MULTIPLIER;
+        double rightStickY = -gamepad.right_stick_y * DRIVE_SPEED_MULTIPLIER;
 
         double rotateValue = 0;
 
