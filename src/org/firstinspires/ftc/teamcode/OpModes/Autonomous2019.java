@@ -17,18 +17,20 @@ public class Autonomous2019 extends OscarBaseOp {
     private double depotAngle;
     private int strafeDistance;
     private StartPosition lander = StartPosition.Depot;
+    public Pixy.CubePosition cubePosition = Pixy.CubePosition.LEFT_CUBE;
 
-    private int LEFT_CUBE_DISTANCE = 1400;
-    private int LEFT_CUBE_ANGLE = 105;
+    private int LEFT_CUBE_DISTANCE = 1700;
+    private int LEFT_CUBE_ANGLE = 115;
     private int LEFT_CUBE_STRAFE = 600;
 
-    private int CENTER_CUBE_DISTANCE = 200;
+    private int CENTER_CUBE_DISTANCE = 300;
     private int CENTER_CUBE_ANGLE = 90;
     private int CENTER_CUBE_STRAFE = 1400;
 
     private int RIGHT_CUBE_DISTANCE = 1050;
-    private int RIGHT_CUBE_ANGLE = 75;
-    private int RIGHT_CUBE_STRAFE = 2000;
+    private int RIGHT_CUBE_ANGLE = 65;
+    private int RIGHT_CUBE_STRAFE = 2300;
+
 
     public enum StartPosition {
         Crater,
@@ -53,7 +55,6 @@ public class Autonomous2019 extends OscarBaseOp {
         STATE_STRAFE_RIGHT,
         STATE_CLEAR_LANDER,
         STATE_LINEUP_MINERALS,
-        STATE_BACK,
         STATE_HIT_MINERALS,
         STATE_TURN_TO_DEPOT,
         STATE_DRIVE_TO_DEPOT,
@@ -81,15 +82,18 @@ public class Autonomous2019 extends OscarBaseOp {
     @Override
     public void init() {
         super.init();
-
+        Pixy.init();
     }
 
     @Override
     public void init_loop() {
         super.init_loop();
+        Pixy.update();
         IsAuton = true;
         telemetry.addLine("Cube X Value: " + Pixy.getCubeX());
         telemetry.addLine("Cube Position: " + Pixy.getCubePosition());
+
+        cubePosition = Pixy.getCubePosition();
 
         switch (lander) {
             case Crater:
@@ -108,8 +112,10 @@ public class Autonomous2019 extends OscarBaseOp {
 
     public void loop() {
         super.loop();
+        RunStateMachine();
+    }
 
-
+    private void RunStateMachine() {
         telemetry.addLine("STATE: " + mCurrentState);
         switch (mCurrentState) {
             case STATE_INITIAL:
@@ -118,7 +124,8 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_DROP:
-                Lift.setPosition(2 * 2100);
+                int dropDistance = 4200;
+                Lift.setPosition(dropDistance);
                 if (Math.abs(Lift.getTargetPos() - Lift.getCurrentPos()) <= 20) {
                     newState(STATE_DETACH_LANDER);
                 }
@@ -127,15 +134,15 @@ public class Autonomous2019 extends OscarBaseOp {
             case STATE_DETACH_LANDER:
                 speed = .3;
                 distance = 100;
-                if (NewMecanumDrive.forward(speed, distance)){
+                if (NewMecanumDrive.backward(speed, distance)){
                     NewMecanumDrive.stop();
                     newState(STATE_STRAFE_RIGHT);
                 }
                 break;
 
             case STATE_STRAFE_RIGHT:
-                speed = .7;
-                distance = 200;
+                speed = .6;
+                distance = 175;
                 if (NewMecanumDrive.right(speed, distance)){
                     NewMecanumDrive.stop();
                     newState(STATE_CLEAR_LANDER);
@@ -145,7 +152,7 @@ public class Autonomous2019 extends OscarBaseOp {
             case STATE_CLEAR_LANDER:
                 speed = .3;
                 distance = 450;
-                if (NewMecanumDrive.forward(speed, distance)){
+                if (NewMecanumDrive.backward(speed, distance)){
                     NewMecanumDrive.stop();
                     newState(STATE_LINEUP_MINERALS);
                 }
@@ -153,45 +160,22 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_LINEUP_MINERALS:
                 speed = .7;
-                distance = 1400;
+                distance = 1350;
                 if (NewMecanumDrive.right(speed, distance)){
                     Lift.runToBottom();
                     NewMecanumDrive.stop();
-                    newState(STATE_BACK);
-                }
-
-                break;
-
-            case STATE_BACK:
-                speed = .25;
-                distance = 900;
-                if (NewMecanumDrive.backward(speed, distance)){
-                    NewMecanumDrive.stop();
                     newState(STATE_HIT_MINERALS);
                 }
+
                 break;
 
             case STATE_HIT_MINERALS:
                 speed = .4;
-
-                switch (Pixy.getCubePosition()) {
+                switch (cubePosition) {
+                    case UNKNOWN_CUBE:
                     case LEFT_CUBE:
                         distance = LEFT_CUBE_DISTANCE;
                         depotAngle = LEFT_CUBE_ANGLE;
-                        strafeDistance = LEFT_CUBE_STRAFE;
-                        if (NewMecanumDrive.forward(speed, distance)){
-                            NewMecanumDrive.stop();
-                            if (lander == StartPosition.Depot)
-                                newState(STATE_TURN_TO_DEPOT);
-                            else
-                                newState(STATE_HIT_CUBE);
-                        }
-                        break;
-
-                    case UNKNOWN_CUBE:
-                        distance = LEFT_CUBE_DISTANCE;
-                        depotAngle = LEFT_CUBE_ANGLE;
-                        strafeDistance = LEFT_CUBE_STRAFE;
                         if (NewMecanumDrive.forward(speed, distance)){
                             NewMecanumDrive.stop();
                             if (lander == StartPosition.Depot)
@@ -204,7 +188,6 @@ public class Autonomous2019 extends OscarBaseOp {
                     case CENTER_CUBE:
                         distance = CENTER_CUBE_DISTANCE;
                         depotAngle = CENTER_CUBE_ANGLE;
-                        strafeDistance = CENTER_CUBE_STRAFE;
                         if (NewMecanumDrive.forward(speed, distance)){
                             NewMecanumDrive.stop();
                             if (lander == StartPosition.Depot)
@@ -217,7 +200,6 @@ public class Autonomous2019 extends OscarBaseOp {
                     case RIGHT_CUBE:
                         distance = RIGHT_CUBE_DISTANCE;
                         depotAngle = RIGHT_CUBE_ANGLE;
-                        strafeDistance = RIGHT_CUBE_STRAFE;
                         if (NewMecanumDrive.backward(speed, distance)){
                             NewMecanumDrive.stop();
                             if (lander == StartPosition.Depot)
@@ -230,43 +212,35 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_TURN_TO_DEPOT:
                 speed = .0;
-//                targetHeading = -depotAngle;
-//                if (MecanumDrive(speed, 0, rotationComp(), 0)) {
-//                    MecanumDrive(0,0,0,0);
-//                }
-                NewMecanumDrive.stop();
-                newState(STATE_DRIVE_TO_DEPOT);
+                if (NewMecanumDrive.turn(-depotAngle)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_DRIVE_TO_DEPOT);
+                }
                 break;
 
             case STATE_DRIVE_TO_DEPOT:
-                if (lander == StartPosition.Depot){
                     distance = 2000;
                     speed = .5;
-                } else {
-                    speed = .25;
-                    distance = 1000;
-                }
 
                 if (NewMecanumDrive.forward(speed, distance)) {
                     NewMecanumDrive.stop();
-                    if (lander == StartPosition.Depot) {
-                        newState(STATE_DROP_MARKER);
-                    } else {
-                        newState(STATE_HIT_CUBE);
-                    }
+                    newState(STATE_DROP_MARKER);
                 }
                 break;
 
             case STATE_HIT_CUBE:
+                boolean isDone = false;
                 speed = .75;
                 distance = 500;
                 if (NewMecanumDrive.right(speed, distance)) {
                     NewMecanumDrive.stop();
+                    isDone = true;
                 }
-
-                if (NewMecanumDrive.left(speed, distance)){
-                    NewMecanumDrive.stop();
-                    newState(STATE_LINEUP_DEPOT);
+                if (isDone) {
+                    if (NewMecanumDrive.left(speed, distance)) {
+                        NewMecanumDrive.stop();
+                        newState(STATE_LINEUP_DEPOT);
+                    }
                 }
                 break;
 
@@ -278,13 +252,10 @@ public class Autonomous2019 extends OscarBaseOp {
                 }
 
             case STATE_TURN_TO_DEPOT_FROM_CRATER:
-                speed = .0;
-//                targetHeading = -depotAngle;
-//                if (MecanumDrive(speed, 0, rotationComp(), 0)) {
-//                    MecanumDrive(0,0,0,0);
-//                }
-                NewMecanumDrive.stop();
-                newState(STATE_DRIVE_TO_DEPOT_FROM_CRATER);
+                if (NewMecanumDrive.turn(-depotAngle)) {
+                    NewMecanumDrive.stop();
+                    newState(STATE_DRIVE_TO_DEPOT_FROM_CRATER);
+                }
                 break;
 
             case STATE_DRIVE_TO_DEPOT_FROM_CRATER:
@@ -304,18 +275,23 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_TURN_TO_CRATER:
-                speed = .0;
-//                targetHeading = -135;
-//                if (MecanumDrive(speed, 0, rotationComp(), 0)){
-//                    newState(STATE_STRAFE_TO_WALL);
-//                    MecanumDrive(0,0,0,0);
-//
-//                }
+                if (NewMecanumDrive.turn(-135)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_STRAFE_TO_WALL);
+                }
                 break;
 
             case STATE_STRAFE_TO_WALL:
-                speed = .5;
-                distance = 500;
+                speed = .75;
+                switch (cubePosition){
+                    case UNKNOWN_CUBE:
+                    case LEFT_CUBE:
+                        distance = LEFT_CUBE_STRAFE;
+                    case CENTER_CUBE:
+                        distance = CENTER_CUBE_STRAFE;
+                    case RIGHT_CUBE:
+                        distance = RIGHT_CUBE_STRAFE;
+                }
                 if (NewMecanumDrive.left(speed, distance)) {
                     Arm.succ(0);
                     NewMecanumDrive.stop();
@@ -324,7 +300,8 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_CLEAR_WALL:
-                speed = .5;
+                speed = .75;
+                distance = 500;
                 if (NewMecanumDrive.right(speed, distance)) {
                     Arm.succ(0);
                     NewMecanumDrive.stop();
@@ -334,18 +311,17 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_DRIVE_TO_CRATER:
                 speed = .5;
-                distance = 1000;
-                if (NewMecanumDrive.forward(speed, distance)) {
+                distance = 2200;
+                if (NewMecanumDrive.backward(speed, distance)) {
                     NewMecanumDrive.stop();
                     newState(STATE_FLUSH_WALL);
                 }
                 break;
 
             case STATE_FLUSH_WALL:
-                speed = .5;
+                speed = .75;
                 distance = 600;
                 if (NewMecanumDrive.left(speed, distance)) {
-                    Arm.succ(0.0);
                     NewMecanumDrive.stop();
                     newState(STATE_APPROACH_CRATER);
                 }
@@ -353,8 +329,8 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_APPROACH_CRATER:
                 speed = .3;
-                distance = 3000;
-                if (NewMecanumDrive.forward(speed, distance)) {
+                distance = 1900;
+                if (NewMecanumDrive.backward(speed, distance)) {
                     NewMecanumDrive.stop();
                     newState(STATE_STOP);
                 }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Base;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 public class Gyro extends OscarCommon {
@@ -13,10 +14,12 @@ public class Gyro extends OscarCommon {
     public static double CurrentGyroHeading = 0.0;
     public static double LastGyroHeading = 0.0;
 
-    public static final double kP = 0.003;
+    public static final double kP = 0.025;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    private static final double kEpsilon = 1;
+    public static final double kEpsilon = 1;
+
+    private static double rotateValue;
 
     private static MiniPID gyroPid;
 
@@ -64,13 +67,23 @@ public class Gyro extends OscarCommon {
         return gyroPid.getOutput(CurrentGyroHeading, TargetHeading);
     }
 
+    public static double compensate(double rotateStick, double lastRotateStick){
+        if (Math.abs(rotateStick) == 0 && Math.abs(lastRotateStick) != 0) {
+            Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (100 * rotateStick)) % 360;
+            rotateValue = Gyro.getCompensation();
+        } else {
+            rotateValue = rotateStick;
+        }
+        return rotateValue;
+    }
+
     protected static double getCompensation(boolean isTurning) {
         double rotation = 0.0;
         double gyro = CurrentGyroHeading;
         double target = TargetHeading;
         double posError = gyro - target;
         double epsilon = 3;
-        double minSpeed = isTurning?.45:.2; // was 0.12
+        double minSpeed = isTurning?.45:.3;
         double maxSpeed = 1;
 
 
@@ -84,7 +97,7 @@ public class Gyro extends OscarCommon {
 
         _telemetry.addData("Gyro Output", rotation);
 
-        return -rotation;
+        return rotation;
     }
 
     protected static double getCompensation() {

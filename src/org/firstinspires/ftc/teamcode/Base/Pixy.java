@@ -7,8 +7,8 @@ public class Pixy extends OscarCommon {
     private static I2cDeviceSynch _pixyCam;
 
     private static final int leftBound = 1;
-    private static final int rightBound = 75;
-    private static final int centerBound = 160;
+    private static final int centerBound = 75;
+    private static final int rightBound = 160;
 
     public static void init(){
         _pixyCam = Hardware.Sensors.pixyCam;

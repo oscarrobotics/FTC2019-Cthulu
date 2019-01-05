@@ -340,7 +340,6 @@ public class BaseOp extends OpMode {
         }
         if (Math.abs(posError) > epsilon) {
             rotation = minSpeed + (Math.abs(posError) / 180) * (maxSpeed - minSpeed);
-            rotation = rotation * Math.signum(posError);
         }
         return -rotation;
     }

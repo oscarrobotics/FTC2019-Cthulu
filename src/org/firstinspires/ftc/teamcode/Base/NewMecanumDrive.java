@@ -8,13 +8,15 @@ public class NewMecanumDrive extends OscarCommon{
 
     private static DcMotor _frontLeft, _frontRight, _backLeft, _backRight;
 
-    public static boolean isFieldOriented;
-    private static boolean doRotationCorrection = false;
+    public static boolean isFieldOriented = false;
 
+    private static int AutoTargetPos = 0;
+    private static int AutoCurrentPos = 0;
+    private static int AutoStartPos = 0;
     private static final int AUTO_MOVE_TOLERANCE = 100;
 
-    private static final double ROTATE_SPEED_MULTIPLIER = .5;
-    private static final double DRIVE_SPEED_MULTIPLIER = 1;
+    private static final double ROTATE_SPEED_MULTIPLIER = 1.2;
+    private static final double DRIVE_SPEED_MULTIPLIER = .9;
 
     public static void init() {
         _frontLeft = Hardware.DriveMotors.frontLeft;
@@ -62,6 +64,7 @@ public class NewMecanumDrive extends OscarCommon{
      */
     private static void driveCartesian(double xSpeed, double ySpeed, double zRotation, double gyroAngle) {
         // Compensate for gyro angle.
+
         Vector2d input = new Vector2d(xSpeed, ySpeed);
         input.rotate(-gyroAngle);
 
@@ -96,68 +99,38 @@ public class NewMecanumDrive extends OscarCommon{
                 magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
     }
 
-//    public static void teleopControl(Gamepad gamepad) {
-//        double rotateStick = Math.pow(gamepad.left_stick_x, 3);
-//        double rightStickX = gamepad.right_stick_x;
-//        double rightStickY = -gamepad.right_stick_y;
-//
-//        driveCartesian(rightStickX, rightStickY, rotateStick, Gyro.CurrentGyroHeading);
-//    }
-
     public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
-        double rotateStick = Math.pow(gamepad.left_stick_x, 3) * ROTATE_SPEED_MULTIPLIER;
-        double lastRotateStick = gamepad.left_stick_x;
+        double rotateStick = gamepad.left_stick_x * ROTATE_SPEED_MULTIPLIER;
+        double lastRotateStick = lastGamepad.left_stick_x * ROTATE_SPEED_MULTIPLIER;
         double rightStickX = gamepad.right_stick_x * DRIVE_SPEED_MULTIPLIER;
         double rightStickY = -gamepad.right_stick_y * DRIVE_SPEED_MULTIPLIER;
-
-        double rotateValue = 0;
 
         if (gamepad.y && !lastGamepad.y) {
             Gyro.zero();
             isFieldOriented = !isFieldOriented;
         }
 
-        if (!isFieldOriented) {
-            rotateValue = rotateStick;
-            /*if (rotateStick == 0) {
-
-                if (!doRotationCorrection) {
-                    doRotationCorrection = true;
-                    Gyro.LastGyroHeading = Gyro.CurrentGyroHeading;
-                }
-
-                double errVal = Gyro.LastGyroHeading - Gyro.CurrentGyroHeading;
-                rotateValue = errVal * Gyro.kP;
-
-            } else {
-                doRotationCorrection = false;
-            }
-
-//            if (rotateStick != 0) {
-//
-//                Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (50 * rotateStick)) % 360;
-//            }
-//
-//            rotateValue = Gyro.CurrentGyroHeading
-*/
-        } else {
-            rotateValue = rotateStick;
+        if(!isFieldOriented) {
+            rotateStick = Gyro.compensate(rotateStick, lastRotateStick);
         }
 
         if (gamepad.dpad_up || gamepad.dpad_down || gamepad.dpad_left || gamepad.dpad_right) {
             if (gamepad.dpad_down) { // backwards
-                backward(gamepad.right_bumper ? .25 : 0.4);
+                backward(gamepad.right_bumper ? .2 : 0.4);
             } else if (gamepad.dpad_left) { // left
-                left(gamepad.right_bumper ? .25 : 0.4);
+                left(gamepad.right_bumper ? .3 : 0.5);
             } else if (gamepad.dpad_up) { // forwards
-                forward(gamepad.right_bumper ? .25 : 0.4);
+                forward(gamepad.right_bumper ? .2 : 0.4);
             } else { // right
-                right(gamepad.right_bumper ? .25 : 0.4);
+                right(gamepad.right_bumper ? .3 : 0.5);
             }
         } else {
-            driveCartesian(rightStickX, rightStickY, rotateValue, fieldAngle());
+            driveCartesian(rightStickX, rightStickY, rotateStick, fieldAngle());
         }
-        _telemetry.addData("FieldOriented", isFieldOriented);
+        _telemetry.addData("Gyro Heading: ", Gyro.CurrentGyroHeading);
+        _telemetry.addData("Gyro Target: ", Gyro.TargetHeading);
+        _telemetry.addData("Rotate Value: ", rotateStick);
+        _telemetry.addData("FieldOriented? ", isFieldOriented);
     }
 
     public static void forward(double power){
@@ -177,45 +150,70 @@ public class NewMecanumDrive extends OscarCommon{
     }
 
     public static boolean forward(double power, int distance){
-        driveCartesian(0, power, 0, fieldAngle());
+        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+        driveCartesian(0, power, Gyro.getCompensation(), fieldAngle());
 
-        int startPos = _backLeft.getCurrentPosition();
-        int targetPos = startPos + distance;
-        return atTarget(targetPos);
+        return atTarget(distance);
     }
 
     public static boolean backward(double power, int distance){
-        driveCartesian(0, -power, 0, fieldAngle());
+        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+        power = -power;
+        distance = -distance;
+        driveCartesian(0, power, Gyro.getCompensation(), fieldAngle());
 
-        int startPos = _backLeft.getCurrentPosition();
-        int targetPos = startPos + distance;
-        return atTarget(targetPos);
+        return atTarget(distance);
     }
 
     public static boolean right(double power, int distance){
-        driveCartesian(power, 0, 0, fieldAngle());
+        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+        distance = -distance;
+        driveCartesian(power, 0, Gyro.getCompensation(), fieldAngle());
 
-        int startPos = _backLeft.getCurrentPosition();
-        int targetPos = startPos + distance;
-        return atTarget(targetPos);
+        return atTarget(distance);
     }
 
     public static boolean left(double power, int distance){
-        driveCartesian(-power, 0, 0, fieldAngle());
+        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+        power = -power;
+        driveCartesian(power, 0, Gyro.getCompensation(), fieldAngle());
 
-        int startPos = _backLeft.getCurrentPosition();
-        int targetPos = startPos + distance;
-        return atTarget(targetPos);
+        return atTarget(distance);
+    }
+
+    public static boolean turn(double speed, double heading){
+        Gyro.TargetHeading = heading;
+        driveCartesian(speed, speed, Gyro.getCompensation(), 0);
+        return (Math.abs(Gyro.TargetHeading) - Math.abs(Gyro.CurrentGyroHeading)) < Gyro.kEpsilon;
+    }
+
+    public static boolean turn(double heading){
+        return turn(0, heading);
+    }
+
+    public static boolean atTarget(int distance){
+        AutoStartPos = AutoStartPos == 0 ? _backLeft.getCurrentPosition() : AutoStartPos;
+        AutoCurrentPos = _backLeft.getCurrentPosition();
+        AutoTargetPos = AutoStartPos + distance;
+
+        _telemetry.addData("Start Pos: ", AutoStartPos);
+        _telemetry.addData("Current Pos: ", AutoCurrentPos);
+        _telemetry.addData("Target Pos: ", AutoTargetPos);
+
+        if (AutoStartPos != 0 && Math.abs(Math.abs(AutoCurrentPos) - Math.abs(AutoTargetPos)) < AUTO_MOVE_TOLERANCE){
+            AutoStartPos = 0;
+            AutoCurrentPos = 0;
+            AutoTargetPos = 0;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static void updateTelemetry(int targetPos) {
         _telemetry.addLine()
                 .addData("Actual", _backLeft.getCurrentPosition())
                 .addData("Dest", targetPos);
-    }
-
-    private static boolean atTarget(int targetPos) {
-        return (Math.abs(_backLeft.getCurrentPosition()) - targetPos < AUTO_MOVE_TOLERANCE);
     }
 
     public static void stop() {
