@@ -26,9 +26,9 @@ public class Arm extends OscarCommon {
     private static final double DUMP_CLOSE = .85;
 
     // extend/retract values
-    private static final int ARM_X_MAX = -3500;
+    private static final int ARM_X_MAX = -3400;
     private static final int ARM_X_MIN = -775;
-    private static final int ARM_X_SCORE = -3200;
+    private static final int ARM_X_SCORE = -3000;
     private static final int ARM_X_CRATER = -2000;
     private static final int ARM_X_MOVE_TOLERANCE = 25;
     private static final double ARM_X_MULTIPLIER = 0.25;//1 equals full power
@@ -134,7 +134,23 @@ public class Arm extends OscarCommon {
     private static void powerMoveArmX(double power) {
         SafetyOutput armSafety = armSafety(power, getXPos(), false);
         _telemetry.addLine("X Safety: " + armSafety._isSafe + ", " + (armSafety._errorDirection == 1 ? "MAX" : "MIN"));
-        if (!armSafety._isSafe) {
+        if (!xInDeadzone) {
+            xWasInDeadzone = false;
+            if (power < 0) {
+                moveArmX(ARM_X_MAX, power);
+            } else {
+                moveArmX(ARM_X_MIN, power);
+            }
+        } else {
+            if (!xWasInDeadzone) {
+                moveArmX(getXPos(), 0.5);
+                xWasInDeadzone = true;
+            }
+
+        }
+    }
+    /*
+    if (!armSafety._isSafe) {
             _intakeArmExtend.setTargetPosition(armSafety._errorDirection == 1 ? ARM_X_MAX : ARM_X_MIN);
             return;
         }
@@ -147,7 +163,7 @@ public class Arm extends OscarCommon {
             _intakeArmExtend.setTargetPosition(getXPos());
             _intakeArmExtend.setMode(RUN_TO_POSITION);
         }
-    }
+     */
 
     private static boolean moveArmY(int setpoint, double power) {
         if (armYTargetPos != setpoint) armYTargetPos = setpoint;

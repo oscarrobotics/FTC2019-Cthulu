@@ -19,16 +19,16 @@ public class Autonomous2019 extends OscarBaseOp {
     private StartPosition lander = StartPosition.Depot;
     public Pixy.CubePosition cubePosition = Pixy.CubePosition.LEFT_CUBE;
 
-    private int LEFT_CUBE_DISTANCE = 1700;
-    private int LEFT_CUBE_ANGLE = 115;
+    private int LEFT_CUBE_DISTANCE = 1400;
+    private int LEFT_CUBE_ANGLE = 105;
     private int LEFT_CUBE_STRAFE = 600;
 
-    private int CENTER_CUBE_DISTANCE = 300;
-    private int CENTER_CUBE_ANGLE = 90;
+    private int CENTER_CUBE_DISTANCE = 350;
+    private int CENTER_CUBE_ANGLE = 85;
     private int CENTER_CUBE_STRAFE = 1400;
 
-    private int RIGHT_CUBE_DISTANCE = 1050;
-    private int RIGHT_CUBE_ANGLE = 65;
+    private int RIGHT_CUBE_DISTANCE = 900;
+    private int RIGHT_CUBE_ANGLE = 70;
     private int RIGHT_CUBE_STRAFE = 2300;
 
 
@@ -219,7 +219,18 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_DRIVE_TO_DEPOT:
-                    distance = 2000;
+                switch (cubePosition){
+                    case UNKNOWN_CUBE:
+                    case LEFT_CUBE:
+                        distance = 2500;
+                    break;
+                    case CENTER_CUBE:
+                        distance = 2300;
+                    break;
+                    case RIGHT_CUBE:
+                        distance = 2250;
+                    break;
+                }
                     speed = .5;
 
                 if (NewMecanumDrive.forward(speed, distance)) {
@@ -320,7 +331,7 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_FLUSH_WALL:
                 speed = .75;
-                distance = 600;
+                distance = 700;
                 if (NewMecanumDrive.left(speed, distance)) {
                     NewMecanumDrive.stop();
                     newState(STATE_APPROACH_CRATER);
@@ -328,8 +339,8 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_APPROACH_CRATER:
-                speed = .3;
-                distance = 1900;
+                speed = .25;
+                distance = 1500;
                 if (NewMecanumDrive.backward(speed, distance)) {
                     NewMecanumDrive.stop();
                     newState(STATE_STOP);
