@@ -82,9 +82,9 @@ public class Gyro extends OscarCommon {
         double gyro = CurrentGyroHeading;
         double target = TargetHeading;
         double posError = gyro - target;
-        double epsilon = 3;
-        double minSpeed = isTurning?.45:.3;
-        double maxSpeed = 1;
+        double epsilon = 5;//3
+        double minSpeed = isTurning?.4:.3;
+        double maxSpeed = 0.5;//1
 
 
         if (Math.abs(posError) > 180) {

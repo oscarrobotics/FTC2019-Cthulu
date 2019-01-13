@@ -149,15 +149,17 @@ public class NewMecanumDrive extends OscarCommon{
         driveCartesian(-power, 0, 0, fieldAngle());
     }
 
-    public static boolean forward(double power, int distance){
-        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+
+
+    public static boolean forward(double power, int distance, int heading){
+        Gyro.TargetHeading = heading;
         driveCartesian(0, power, Gyro.getCompensation(), fieldAngle());
 
         return atTarget(distance);
     }
 
-    public static boolean backward(double power, int distance){
-        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+    public static boolean backward(double power, int distance, int heading){
+        Gyro.TargetHeading = heading;
         power = -power;
         distance = -distance;
         driveCartesian(0, power, Gyro.getCompensation(), fieldAngle());
@@ -165,16 +167,16 @@ public class NewMecanumDrive extends OscarCommon{
         return atTarget(distance);
     }
 
-    public static boolean right(double power, int distance){
-        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+    public static boolean right(double power, int distance, int heading){
+        Gyro.TargetHeading = heading;
         distance = -distance;
         driveCartesian(power, 0, Gyro.getCompensation(), fieldAngle());
 
         return atTarget(distance);
     }
 
-    public static boolean left(double power, int distance){
-        Gyro.TargetHeading = Gyro.CurrentGyroHeading;
+    public static boolean left(double power, int distance, int heading){
+        Gyro.TargetHeading = heading;
         power = -power;
         driveCartesian(power, 0, Gyro.getCompensation(), fieldAngle());
 
@@ -200,7 +202,7 @@ public class NewMecanumDrive extends OscarCommon{
         _telemetry.addData("Current Pos: ", AutoCurrentPos);
         _telemetry.addData("Target Pos: ", AutoTargetPos);
 
-        if (AutoStartPos != 0 && Math.abs(Math.abs(AutoCurrentPos) - Math.abs(AutoTargetPos)) < AUTO_MOVE_TOLERANCE){
+        if (AutoStartPos != 0 && Math.abs(AutoCurrentPos - AutoTargetPos) < AUTO_MOVE_TOLERANCE){
             AutoStartPos = 0;
             AutoCurrentPos = 0;
             AutoTargetPos = 0;

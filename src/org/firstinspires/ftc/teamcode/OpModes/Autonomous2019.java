@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.Base.Pixy;
 import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 
+import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.CraterState.*;
+import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.DepotState.*;
 import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.State.*;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
@@ -13,24 +15,29 @@ public class Autonomous2019 extends OscarBaseOp {
 
     private int stateCounter = 0;
     private double speed = 0.0;
-    private int distance;
-    private double depotAngle;
-    private int strafeDistance;
-    private StartPosition lander = StartPosition.Depot;
+    public int distance;
+    public int heading;
+    public double depotAngle;
+    public int strafeDistance;
+    private StartPosition lander = StartPosition.Crater;
     public Pixy.CubePosition cubePosition = Pixy.CubePosition.LEFT_CUBE;
 
-    private int LEFT_CUBE_DISTANCE = 1400;
+    private int LEFT_CUBE_DISTANCE = 1500;
+    private int LEFT_CUBE_CRATER_DISTANCE = 1200;
     private int LEFT_CUBE_ANGLE = 105;
     private int LEFT_CUBE_STRAFE = 600;
 
-    private int CENTER_CUBE_DISTANCE = 350;
+    private int CENTER_CUBE_DISTANCE = 300;
+    private int CENTER_CUBE_CRATER_DISTANCE = 200;
     private int CENTER_CUBE_ANGLE = 85;
-    private int CENTER_CUBE_STRAFE = 1400;
+    private int CENTER_CUBE_STRAFE = 1100;
 
-    private int RIGHT_CUBE_DISTANCE = 900;
-    private int RIGHT_CUBE_ANGLE = 70;
-    private int RIGHT_CUBE_STRAFE = 2300;
+    private int RIGHT_CUBE_DISTANCE = 1100;
+    private int RIGHT_CUBE_CRATER_DISTANCE = 800;
+    private int RIGHT_CUBE_ANGLE = 65;
+    private int RIGHT_CUBE_STRAFE = 2000;
 
+    private final double SPEED_MULTIPLIER = 0.7;
 
     public enum StartPosition {
         Crater,
@@ -38,45 +45,84 @@ public class Autonomous2019 extends OscarBaseOp {
     }
 
     private ElapsedTime mStateTime = new ElapsedTime();  // Time into current state
-    private State mCurrentState;
+    private ElapsedTime mDepotStateTime = new ElapsedTime();  // Time into current state
+    private ElapsedTime mCraterStateTime = new ElapsedTime();  // Time into current state
+    private State mCurrentMainState;
+    private DepotState mCurrentDepotState;
+    private CraterState mCurrentCraterState;
 
     private void newState(State newState){
         // Reset the state time, and then change to next state.
         mStateTime.reset();
-        mCurrentState = newState;
-        telemetry.addData("State", mCurrentState);
+        mCurrentMainState = newState;
+        telemetry.addData("State", mCurrentMainState);
+        stateCounter++;
+    }
+
+    private void newDepotState(DepotState newState) {
+        mDepotStateTime.reset();
+        mCurrentDepotState = newState;
+        telemetry.addData("DepotState", mCurrentDepotState);
+        stateCounter++;
+    }
+
+    private void newCraterState(CraterState newState) {
+        mCraterStateTime.reset();
+        mCurrentCraterState = newState;
+        telemetry.addData("CraterState", mCurrentCraterState);
         stateCounter++;
     }
 
     public static enum State { // Ideally, these stay in order of how we use them
         STATE_INITIAL,
-        STATE_DROP,
+        STATE_DROP_FROM_LANDER,
         STATE_DETACH_LANDER,
         STATE_STRAFE_RIGHT,
         STATE_CLEAR_LANDER,
         STATE_LINEUP_MINERALS,
         STATE_HIT_MINERALS,
-        STATE_TURN_TO_DEPOT,
-        STATE_DRIVE_TO_DEPOT,
-        STATE_HIT_CUBE,
-        STATE_LINEUP_DEPOT,
-        STATE_TURN_TO_DEPOT_FROM_CRATER,
-        STATE_DRIVE_TO_DEPOT_FROM_CRATER,
-        STATE_DROP_MARKER,
-        STATE_RETURN_TO_CRATER,
-        STATE_TURN_TO_CRATER,
-        STATE_STRAFE_TO_WALL,
-        STATE_CLEAR_WALL,
-        STATE_DRIVE_TO_CRATER,
-        STATE_FLUSH_WALL,
-        STATE_APPROACH_CRATER,
+        STATE_DIFFERENTIATE_PATHS,
         STATE_STOP
     }
+
+    public enum DepotState {
+        DS_INITIAL,
+        DS_TURN_TO_DEPOT,
+        DS_DRIVE_TO_DEPOT,
+        DS_EJECT_MARKER,
+        DS_TURN_TO_CRATER,
+        DS_STRAFE_TO_WALL1,
+        DS_CLEAR_WALL,
+        DS_DRIVE_TO_CRATER1,
+        DS_STRAFE_TO_WALL2,
+        DS_DRIVE_TO_CRATER2,
+        DS_STOP
+    }
+
+    public enum CraterState {
+        CS_INITIAL,
+        CS_HIT_CUBE,
+        CS_UN_HIT_CUBE,
+        CS_LINEUP_DEPOT,
+        CS_TURN_TO_DEPOT,
+        CS_DRIVE_TO_DEPOT1,
+        CS_FLUSH_TO_WALL1,
+        CS_CLEAR_WALL,
+        CS_DRIVE_TO_DEPOT2,
+        CS_EJECT_MARKER,
+        CS_RETURN_TO_CRATER,
+        CS_FLUSH_TO_WALL2,
+        CS_APPROACH_CRATER,
+        CS_STOP
+    }
+
     //code
     @Override
     public void start() {
         resetStartTime();
         newState(State.STATE_INITIAL);
+        newDepotState(DS_INITIAL);
+        newCraterState(CS_INITIAL);
     }
 
     @Override
@@ -115,185 +161,174 @@ public class Autonomous2019 extends OscarBaseOp {
         RunStateMachine();
     }
 
-    private void RunStateMachine() {
-        telemetry.addLine("STATE: " + mCurrentState);
-        switch (mCurrentState) {
-            case STATE_INITIAL:
-                Pixy.update();
-                newState(STATE_DROP);
+    private void Crater() {
+        switch (mCurrentCraterState) {
+            case CS_INITIAL:
+                NewMecanumDrive.stop();
+                newCraterState(CS_HIT_CUBE);
                 break;
-
-            case STATE_DROP:
-                int dropDistance = 4200;
-                Lift.setPosition(dropDistance);
-                if (Math.abs(Lift.getTargetPos() - Lift.getCurrentPos()) <= 20) {
-                    newState(STATE_DETACH_LANDER);
-                }
-                break;
-
-            case STATE_DETACH_LANDER:
-                speed = .3;
-                distance = 100;
-                if (NewMecanumDrive.backward(speed, distance)){
+            case CS_HIT_CUBE:
+                speed = .75 * SPEED_MULTIPLIER;
+                distance = 1000;
+                if (NewMecanumDrive.right(speed, distance, 0)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_STRAFE_RIGHT);
+                    newCraterState(CS_UN_HIT_CUBE);
                 }
                 break;
 
-            case STATE_STRAFE_RIGHT:
-                speed = .6;
-                distance = 175;
-                if (NewMecanumDrive.right(speed, distance)){
+            case CS_UN_HIT_CUBE:
+                speed = .75 * SPEED_MULTIPLIER;
+                distance = 1000;
+                if (NewMecanumDrive.left(speed, distance, 0)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_CLEAR_LANDER);
+                    newCraterState(CS_LINEUP_DEPOT);
                 }
                 break;
 
-            case STATE_CLEAR_LANDER:
-                speed = .3;
-                distance = 450;
-                if (NewMecanumDrive.backward(speed, distance)){
+            case CS_LINEUP_DEPOT:
+                speed = 0.5 * SPEED_MULTIPLIER;
+                distance = 3000;
+                if (NewMecanumDrive.forward(speed, distance, 0)) {
+                    newCraterState(CS_TURN_TO_DEPOT);
+                }
+                break;
+
+            case CS_TURN_TO_DEPOT:
+                if (NewMecanumDrive.turn(45)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_LINEUP_MINERALS);
+                    newCraterState(CS_DRIVE_TO_DEPOT1);
                 }
                 break;
 
-            case STATE_LINEUP_MINERALS:
-                speed = .7;
-                distance = 1350;
-                if (NewMecanumDrive.right(speed, distance)){
-                    Lift.runToBottom();
+            case CS_DRIVE_TO_DEPOT1:
+                speed = 0.5 * SPEED_MULTIPLIER;
+                distance = 1400;
+                if (NewMecanumDrive.forward(speed, distance, 45)) {
+                    newCraterState(CS_FLUSH_TO_WALL1);
+                }
+                break;
+
+            case CS_FLUSH_TO_WALL1:
+                speed = .75 * SPEED_MULTIPLIER;
+                distance = 500;
+                if (NewMecanumDrive.right(speed, distance, 45)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_HIT_MINERALS);
-                }
-
-                break;
-
-            case STATE_HIT_MINERALS:
-                speed = .4;
-                switch (cubePosition) {
-                    case UNKNOWN_CUBE:
-                    case LEFT_CUBE:
-                        distance = LEFT_CUBE_DISTANCE;
-                        depotAngle = LEFT_CUBE_ANGLE;
-                        if (NewMecanumDrive.forward(speed, distance)){
-                            NewMecanumDrive.stop();
-                            if (lander == StartPosition.Depot)
-                                newState(STATE_TURN_TO_DEPOT);
-                            else
-                                newState(STATE_HIT_CUBE);
-                        }
-                        break;
-
-                    case CENTER_CUBE:
-                        distance = CENTER_CUBE_DISTANCE;
-                        depotAngle = CENTER_CUBE_ANGLE;
-                        if (NewMecanumDrive.forward(speed, distance)){
-                            NewMecanumDrive.stop();
-                            if (lander == StartPosition.Depot)
-                                newState(STATE_TURN_TO_DEPOT);
-                            else
-                                newState(STATE_HIT_CUBE);
-                        }
-                        break;
-
-                    case RIGHT_CUBE:
-                        distance = RIGHT_CUBE_DISTANCE;
-                        depotAngle = RIGHT_CUBE_ANGLE;
-                        if (NewMecanumDrive.backward(speed, distance)){
-                            NewMecanumDrive.stop();
-                            if (lander == StartPosition.Depot)
-                                newState(STATE_TURN_TO_DEPOT);
-                            else
-                                newState(STATE_HIT_CUBE);
-                        }
+                    newCraterState(CS_CLEAR_WALL);
                 }
                 break;
 
-            case STATE_TURN_TO_DEPOT:
+            case CS_CLEAR_WALL:
+                speed = .75 * SPEED_MULTIPLIER;
+                distance = 300;
+                if (NewMecanumDrive.left(speed, distance, 45)) {
+                    NewMecanumDrive.stop();
+                    newCraterState(CS_DRIVE_TO_DEPOT2);
+                }
+                break;
+
+            case CS_DRIVE_TO_DEPOT2:
+                speed = .5 * SPEED_MULTIPLIER;
+                distance = 500;
+                if (NewMecanumDrive.backward(speed, distance, 45)) {
+                    NewMecanumDrive.stop();
+                    newCraterState(CS_EJECT_MARKER);
+                }
+                break;
+
+            case CS_EJECT_MARKER:
+                if (mStateTime.milliseconds() <= 3000){
+                    Arm.succ(0);
+                } else {
+                newCraterState(CS_RETURN_TO_CRATER);
+                }
+                break;
+
+            case CS_RETURN_TO_CRATER:
+                speed = 0.5 * SPEED_MULTIPLIER;
+                distance = 2000;
+                if (NewMecanumDrive.backward(speed, distance, 45)){
+                    newCraterState(CS_FLUSH_TO_WALL2);
+                }
+                break;
+
+            case CS_FLUSH_TO_WALL2:
+                speed = .75 * SPEED_MULTIPLIER;
+                distance = 500;
+                if (NewMecanumDrive.right(speed, distance, 45)) {
+                    Arm.succ(0);
+                    NewMecanumDrive.stop();
+                    newCraterState(CS_APPROACH_CRATER);
+                }
+                break;
+
+            case CS_APPROACH_CRATER:
+                speed = 0.5 * SPEED_MULTIPLIER;
+                distance = 400;
+                if (NewMecanumDrive.backward(speed, distance, 45)){
+                    newCraterState(CS_STOP);
+                }
+                break;
+
+            case CS_STOP:
+                newState(STATE_STOP);
+        }
+    }
+
+    private void Depot() {
+        switch (mCurrentDepotState) {
+            case DS_INITIAL:
+                NewMecanumDrive.stop();
+                break;
+            case DS_TURN_TO_DEPOT:
                 speed = .0;
                 if (NewMecanumDrive.turn(-depotAngle)){
                     NewMecanumDrive.stop();
-                    newState(STATE_DRIVE_TO_DEPOT);
+                    newDepotState(DS_DRIVE_TO_DEPOT);
                 }
                 break;
 
-            case STATE_DRIVE_TO_DEPOT:
-                switch (cubePosition){
+            case DS_DRIVE_TO_DEPOT:
+                switch (cubePosition) {
                     case UNKNOWN_CUBE:
                     case LEFT_CUBE:
-                        distance = 2500;
-                    break;
+                        distance = 2800;
+                        heading = -LEFT_CUBE_ANGLE;
+                        break;
                     case CENTER_CUBE:
                         distance = 2300;
-                    break;
+                        heading = -CENTER_CUBE_ANGLE;
+                        break;
                     case RIGHT_CUBE:
-                        distance = 2250;
-                    break;
+                        distance = 2500;
+                        heading = -RIGHT_CUBE_ANGLE;
+                        break;
                 }
-                    speed = .5;
-
-                if (NewMecanumDrive.forward(speed, distance)) {
+                speed = .5 * SPEED_MULTIPLIER;
+                telemetry.addData("Distance", distance);
+                if (NewMecanumDrive.forward(speed, distance, heading)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_DROP_MARKER);
+                    newDepotState(DS_EJECT_MARKER);
                 }
                 break;
 
-            case STATE_HIT_CUBE:
-                boolean isDone = false;
-                speed = .75;
-                distance = 500;
-                if (NewMecanumDrive.right(speed, distance)) {
-                    NewMecanumDrive.stop();
-                    isDone = true;
-                }
-                if (isDone) {
-                    if (NewMecanumDrive.left(speed, distance)) {
-                        NewMecanumDrive.stop();
-                        newState(STATE_LINEUP_DEPOT);
-                    }
-                }
-                break;
-
-            case STATE_LINEUP_DEPOT:
-                speed = 0.5;
-                distance = 700;
-                if (NewMecanumDrive.forward(speed, distance)){
-                    newState(STATE_TURN_TO_DEPOT_FROM_CRATER);
-                }
-
-            case STATE_TURN_TO_DEPOT_FROM_CRATER:
-                if (NewMecanumDrive.turn(-depotAngle)) {
-                    NewMecanumDrive.stop();
-                    newState(STATE_DRIVE_TO_DEPOT_FROM_CRATER);
-                }
-                break;
-
-            case STATE_DRIVE_TO_DEPOT_FROM_CRATER:
-                speed = 0.5;
-                distance = 2000;
-                if (NewMecanumDrive.forward(speed, distance)){
-                    newState(STATE_RETURN_TO_CRATER);
-                }
-
-            case STATE_DROP_MARKER:
+            case DS_EJECT_MARKER:
                 if (mStateTime.milliseconds() >= 3000){
                     Arm.succ(0);
                 } else {
                     Arm.unSucc(1);
-                    newState(STATE_TURN_TO_CRATER);
+                    newDepotState(DS_TURN_TO_CRATER);
                 }
                 break;
 
-            case STATE_TURN_TO_CRATER:
+            case DS_TURN_TO_CRATER:
                 if (NewMecanumDrive.turn(-135)){
                     NewMecanumDrive.stop();
-                    newState(STATE_STRAFE_TO_WALL);
+                    newDepotState(DS_STRAFE_TO_WALL1);
                 }
                 break;
 
-            case STATE_STRAFE_TO_WALL:
-                speed = .75;
+            case DS_STRAFE_TO_WALL1:
+                speed = .75 * SPEED_MULTIPLIER;
                 switch (cubePosition){
                     case UNKNOWN_CUBE:
                     case LEFT_CUBE:
@@ -303,54 +338,163 @@ public class Autonomous2019 extends OscarBaseOp {
                     case RIGHT_CUBE:
                         distance = RIGHT_CUBE_STRAFE;
                 }
-                if (NewMecanumDrive.left(speed, distance)) {
+                if (NewMecanumDrive.left(speed, distance, -135)) {
                     Arm.succ(0);
                     NewMecanumDrive.stop();
-                    newState(STATE_CLEAR_WALL);
+                    newDepotState(DS_CLEAR_WALL);
                 }
                 break;
 
-            case STATE_CLEAR_WALL:
-                speed = .75;
-                distance = 500;
-                if (NewMecanumDrive.right(speed, distance)) {
+            case DS_CLEAR_WALL:
+                speed = .75 * SPEED_MULTIPLIER;
+                distance = 400;
+                if (NewMecanumDrive.right(speed, distance, -135)) {
                     Arm.succ(0);
                     NewMecanumDrive.stop();
-                    newState(STATE_DRIVE_TO_CRATER);
+                    newDepotState(DS_DRIVE_TO_CRATER1);
                 }
                 break;
 
-            case STATE_DRIVE_TO_CRATER:
-                speed = .5;
-                distance = 2200;
-                if (NewMecanumDrive.backward(speed, distance)) {
+            case DS_DRIVE_TO_CRATER1:
+                speed = .5 * SPEED_MULTIPLIER;
+                distance = 2500;
+                if (NewMecanumDrive.backward(speed, distance, -135)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_FLUSH_WALL);
+                    newDepotState(DS_STRAFE_TO_WALL2);
                 }
                 break;
 
-            case STATE_FLUSH_WALL:
-                speed = .75;
+            case DS_STRAFE_TO_WALL2:
+                speed = .75 * SPEED_MULTIPLIER;
                 distance = 700;
-                if (NewMecanumDrive.left(speed, distance)) {
+                if (NewMecanumDrive.left(speed, distance, -135)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_APPROACH_CRATER);
+                    newDepotState(DS_DRIVE_TO_CRATER2);
                 }
                 break;
 
-            case STATE_APPROACH_CRATER:
-                speed = .25;
-                distance = 1500;
-                if (NewMecanumDrive.backward(speed, distance)) {
+            case DS_DRIVE_TO_CRATER2:
+                speed = .4 * SPEED_MULTIPLIER;
+                distance = 2500;
+                if (NewMecanumDrive.backward(speed, distance, -135)) {
                     NewMecanumDrive.stop();
-                    newState(STATE_STOP);
+                    newDepotState(DS_STOP);
                 }
                 break;
+
+            case DS_STOP:
+                newState(STATE_STOP);
+                break;
+        }
+    }
+
+    private void RunStateMachine() {
+        distance = 0;
+        telemetry.addLine("STATE: " + mCurrentMainState);
+        switch (mCurrentMainState) {
+            case STATE_INITIAL:
+                Pixy.update();
+                newState(STATE_DROP_FROM_LANDER);
+                break;
+
+            case STATE_DROP_FROM_LANDER:
+                int dropDistance = 4200;
+                Lift.setPosition(dropDistance);
+                if (Math.abs(Lift.getTargetPos() - Lift.getCurrentPos()) <= 20) {
+                    newState(STATE_DETACH_LANDER);
+                }
+                break;
+
+            case STATE_DETACH_LANDER:
+                speed = .3 * SPEED_MULTIPLIER;
+                distance = 100;
+                telemetry.addData("Distance", distance);
+
+                if (NewMecanumDrive.backward(speed, distance, 0) || mStateTime.milliseconds() >= 2000){
+                    NewMecanumDrive.stop();
+                    newState(STATE_STRAFE_RIGHT);
+                }
+                break;
+
+            case STATE_STRAFE_RIGHT:
+                speed = .6 * SPEED_MULTIPLIER;
+                distance = 175;
+                if (NewMecanumDrive.right(speed, distance, 0)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_CLEAR_LANDER);
+                }
+                break;
+
+            case STATE_CLEAR_LANDER:
+                speed = .3 * SPEED_MULTIPLIER;
+                distance = 450;
+                if (NewMecanumDrive.backward(speed, distance, 0)){
+                    NewMecanumDrive.stop();
+                    newState(STATE_LINEUP_MINERALS);
+                }
+                break;
+
+            case STATE_LINEUP_MINERALS:
+                speed = .7 * SPEED_MULTIPLIER;
+                distance = 1500;
+                if (NewMecanumDrive.right(speed, distance, 0)){
+                    Lift.runToBottom();
+                    NewMecanumDrive.stop();
+                    newState(STATE_HIT_MINERALS);
+                }
+
+                break;
+
+            case STATE_HIT_MINERALS:
+                speed = .4 * SPEED_MULTIPLIER;
+                switch (cubePosition) {
+                    case UNKNOWN_CUBE:
+                    case LEFT_CUBE:
+                        if (lander == StartPosition.Depot)
+                            distance = LEFT_CUBE_DISTANCE;
+                        else
+                            distance = LEFT_CUBE_CRATER_DISTANCE;
+                        depotAngle = LEFT_CUBE_ANGLE;
+                        if (NewMecanumDrive.forward(speed, distance, 0)){
+                            NewMecanumDrive.stop();
+                            newState(STATE_DIFFERENTIATE_PATHS);
+                        }
+                        break;
+
+                    case CENTER_CUBE:
+                        if (lander == StartPosition.Depot)
+                            distance = CENTER_CUBE_DISTANCE;
+                        else
+                            distance = CENTER_CUBE_CRATER_DISTANCE;
+                        depotAngle = CENTER_CUBE_ANGLE;
+                        if (NewMecanumDrive.forward(speed, distance, 0)){
+                            NewMecanumDrive.stop();
+                            newState(STATE_DIFFERENTIATE_PATHS);
+                        }
+                        break;
+
+                    case RIGHT_CUBE:
+                        if (lander == StartPosition.Depot)
+                            distance = RIGHT_CUBE_DISTANCE;
+                        else
+                            distance = RIGHT_CUBE_CRATER_DISTANCE;
+                        depotAngle = RIGHT_CUBE_ANGLE;
+                        if (NewMecanumDrive.backward(speed, distance, 0)){
+                            NewMecanumDrive.stop();
+                            newState(STATE_DIFFERENTIATE_PATHS);
+                        }
+                }
+                break;
+
+            case STATE_DIFFERENTIATE_PATHS:
+                if (lander == StartPosition.Crater)
+                    Crater();
+                else
+                    Depot();
 
             case STATE_STOP:
                 NewMecanumDrive.stop();
                 break;
-
         }
     }
 }

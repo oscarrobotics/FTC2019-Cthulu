@@ -269,10 +269,10 @@ public class Arm extends OscarCommon {
         }
 
          if (hasYZeroed) {
-             if (gamepad.x && !lastGamepad.x && currentBmgState == BigMoveGroundState.IDLE) {
+             if (gamepad.b && !lastGamepad.b && currentBmgState == BigMoveGroundState.IDLE) {
                  currentBmgState = BigMoveGroundState.BEGIN;
              }
-             if (gamepad.b && !lastGamepad.b && currentBmsState == BigMoveScoreState.IDLE) {
+             if (gamepad.x && !lastGamepad.x && currentBmsState == BigMoveScoreState.IDLE) {
                  currentBmsState = BigMoveScoreState.BEGIN;
              }
              ground();
