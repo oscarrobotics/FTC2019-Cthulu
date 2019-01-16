@@ -29,7 +29,7 @@ public class Arm extends OscarCommon {
     private static final int ARM_X_MAX = -3400;
     private static final int ARM_X_MIN = -775;
     private static final int ARM_X_SCORE = -3000;
-    private static final int ARM_X_CRATER = -2000;
+    private static final int ARM_X_CRATER = -2400;
     private static final int ARM_X_MOVE_TOLERANCE = 25;
     private static final double ARM_X_MULTIPLIER = 0.25;//1 equals full power
     private static final double ARM_X_MULTIPLIER_BOOOoST = 2.5;//1 equals 100% or normal multiplier power
@@ -299,8 +299,12 @@ public class Arm extends OscarCommon {
                 newBmsState(BigMoveScoreState.X_RETRACT);
                 break;
             case X_RETRACT:
-                if (moveArmX(ARM_X_MIN, 1)) {
-                    newBmsState(BigMoveScoreState.Y_RAISE);
+                if (Math.abs(getYPos()) < 1800) {
+                    if (moveArmX(ARM_X_MIN, 1)) {
+                        newBmsState(BigMoveScoreState.Y_RAISE);
+                    }
+                } else {
+                    newBmsState(BigMoveScoreState.IDLE);
                 }
                 break;
             case Y_RAISE:
@@ -317,7 +321,6 @@ public class Arm extends OscarCommon {
                 // DO NOTHING
                 break;
         }
-
     }
 
     private static void ground() {
@@ -354,6 +357,10 @@ public class Arm extends OscarCommon {
 
     public static void unSucc(double unSuccPower) {
         _intakeCollect.setPower(-Math.pow(unSuccPower, 2));
+    }
+
+    public static void autoIntake(double power) {
+        _intakeCollect.setPower(power);
     }
 
     private static void dumpMineral(boolean state) {

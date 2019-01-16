@@ -100,10 +100,12 @@ public class NewMecanumDrive extends OscarCommon{
     }
 
     public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
-        double rotateStick = gamepad.left_stick_x * ROTATE_SPEED_MULTIPLIER;
-        double lastRotateStick = lastGamepad.left_stick_x * ROTATE_SPEED_MULTIPLIER;
-        double rightStickX = gamepad.right_stick_x * DRIVE_SPEED_MULTIPLIER;
-        double rightStickY = -gamepad.right_stick_y * DRIVE_SPEED_MULTIPLIER;
+        boolean leftStickTranslationalDrive = true;
+
+        double rotateStick = leftStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
+        double lastRotateStick = leftStickTranslationalDrive ? lastGamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
+        double rightStickX = leftStickTranslationalDrive ? gamepad.right_stick_x : gamepad.left_stick_x* DRIVE_SPEED_MULTIPLIER;
+        double rightStickY = leftStickTranslationalDrive ? -gamepad.right_stick_y : -gamepad.left_stick_y* DRIVE_SPEED_MULTIPLIER;
 
         if (gamepad.y && !lastGamepad.y) {
             Gyro.zero();

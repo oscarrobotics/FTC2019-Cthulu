@@ -13,7 +13,6 @@ import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.State.*;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
 public class Autonomous2019 extends OscarBaseOp {
 
-    private int stateCounter = 0;
     private double speed = 0.0;
     public int distance;
     public int heading;
@@ -41,7 +40,7 @@ public class Autonomous2019 extends OscarBaseOp {
 
     public enum StartPosition {
         Crater,
-        Depot,
+        Depot
     }
 
     private ElapsedTime mStateTime = new ElapsedTime();  // Time into current state
@@ -55,22 +54,16 @@ public class Autonomous2019 extends OscarBaseOp {
         // Reset the state time, and then change to next state.
         mStateTime.reset();
         mCurrentMainState = newState;
-        telemetry.addData("State", mCurrentMainState);
-        stateCounter++;
     }
 
     private void newDepotState(DepotState newState) {
         mDepotStateTime.reset();
         mCurrentDepotState = newState;
-        telemetry.addData("DepotState", mCurrentDepotState);
-        stateCounter++;
     }
 
     private void newCraterState(CraterState newState) {
         mCraterStateTime.reset();
         mCurrentCraterState = newState;
-        telemetry.addData("CraterState", mCurrentCraterState);
-        stateCounter++;
     }
 
     public static enum State { // Ideally, these stay in order of how we use them
@@ -82,6 +75,7 @@ public class Autonomous2019 extends OscarBaseOp {
         STATE_LINEUP_MINERALS,
         STATE_HIT_MINERALS,
         STATE_DIFFERENTIATE_PATHS,
+        STATE_IDLE,
         STATE_STOP
     }
 
@@ -139,6 +133,8 @@ public class Autonomous2019 extends OscarBaseOp {
         telemetry.addLine("Cube X Value: " + Pixy.getCubeX());
         telemetry.addLine("Cube Position: " + Pixy.getCubePosition());
 
+        Arm.autoIntake(1);
+
         cubePosition = Pixy.getCubePosition();
 
         switch (lander) {
@@ -159,6 +155,9 @@ public class Autonomous2019 extends OscarBaseOp {
     public void loop() {
         super.loop();
         RunStateMachine();
+        telemetry.addLine("STATE: " + mCurrentMainState)
+                .addData("DEPOT: " , mCurrentDepotState)
+                .addData("CRATER: ", mCurrentCraterState);
     }
 
     private void Crater() {
@@ -236,10 +235,10 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case CS_EJECT_MARKER:
-                if (mStateTime.milliseconds() <= 3000){
-                    Arm.succ(0);
-                } else {
-                newCraterState(CS_RETURN_TO_CRATER);
+                Arm.autoIntake(1);
+                if (mCraterStateTime.milliseconds() >= 3000){
+                    Arm.autoIntake(0);
+                    newCraterState(CS_RETURN_TO_CRATER);
                 }
                 break;
 
@@ -255,14 +254,13 @@ public class Autonomous2019 extends OscarBaseOp {
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = 500;
                 if (NewMecanumDrive.right(speed, distance, 45)) {
-                    Arm.succ(0);
                     NewMecanumDrive.stop();
                     newCraterState(CS_APPROACH_CRATER);
                 }
                 break;
 
             case CS_APPROACH_CRATER:
-                speed = 0.5 * SPEED_MULTIPLIER;
+                speed = 0.3 * SPEED_MULTIPLIER;
                 distance = 400;
                 if (NewMecanumDrive.backward(speed, distance, 45)){
                     newCraterState(CS_STOP);
@@ -278,6 +276,7 @@ public class Autonomous2019 extends OscarBaseOp {
         switch (mCurrentDepotState) {
             case DS_INITIAL:
                 NewMecanumDrive.stop();
+                newDepotState(DS_TURN_TO_DEPOT);
                 break;
             case DS_TURN_TO_DEPOT:
                 speed = .0;
@@ -312,10 +311,9 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case DS_EJECT_MARKER:
-                if (mStateTime.milliseconds() >= 3000){
-                    Arm.succ(0);
-                } else {
-                    Arm.unSucc(1);
+                Arm.autoIntake(1);
+                if (mDepotStateTime.milliseconds() >= 3000) {
+                    Arm.autoIntake(0);
                     newDepotState(DS_TURN_TO_CRATER);
                 }
                 break;
@@ -339,7 +337,6 @@ public class Autonomous2019 extends OscarBaseOp {
                         distance = RIGHT_CUBE_STRAFE;
                 }
                 if (NewMecanumDrive.left(speed, distance, -135)) {
-                    Arm.succ(0);
                     NewMecanumDrive.stop();
                     newDepotState(DS_CLEAR_WALL);
                 }
@@ -349,7 +346,6 @@ public class Autonomous2019 extends OscarBaseOp {
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = 400;
                 if (NewMecanumDrive.right(speed, distance, -135)) {
-                    Arm.succ(0);
                     NewMecanumDrive.stop();
                     newDepotState(DS_DRIVE_TO_CRATER1);
                 }
@@ -374,7 +370,7 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case DS_DRIVE_TO_CRATER2:
-                speed = .4 * SPEED_MULTIPLIER;
+                speed = .3 * SPEED_MULTIPLIER;
                 distance = 2500;
                 if (NewMecanumDrive.backward(speed, distance, -135)) {
                     NewMecanumDrive.stop();
@@ -389,8 +385,6 @@ public class Autonomous2019 extends OscarBaseOp {
     }
 
     private void RunStateMachine() {
-        distance = 0;
-        telemetry.addLine("STATE: " + mCurrentMainState);
         switch (mCurrentMainState) {
             case STATE_INITIAL:
                 Pixy.update();
@@ -398,7 +392,7 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_DROP_FROM_LANDER:
-                int dropDistance = 4200;
+                int dropDistance = 4150;
                 Lift.setPosition(dropDistance);
                 if (Math.abs(Lift.getTargetPos() - Lift.getCurrentPos()) <= 20) {
                     newState(STATE_DETACH_LANDER);
@@ -487,10 +481,14 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
 
             case STATE_DIFFERENTIATE_PATHS:
-                if (lander == StartPosition.Crater)
+                if (lander == StartPosition.Crater) {
                     Crater();
-                else
+                    telemetry.addData("Position", lander);
+                } else {
                     Depot();
+                    telemetry.addData("Position", lander);
+                }
+                break;
 
             case STATE_STOP:
                 NewMecanumDrive.stop();
