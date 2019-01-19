@@ -108,8 +108,8 @@ public class NewMecanumDrive extends OscarCommon{
         double rightStickY = leftStickTranslationalDrive ? -gamepad.right_stick_y : -gamepad.left_stick_y* DRIVE_SPEED_MULTIPLIER;
 
         if (gamepad.y && !lastGamepad.y) {
-            Gyro.zero();
             isFieldOriented = !isFieldOriented;
+            Gyro.reset();
         }
 
         if(!isFieldOriented) {
@@ -136,19 +136,17 @@ public class NewMecanumDrive extends OscarCommon{
     }
 
     public static void forward(double power){
-        driveCartesian(0, power, 0, fieldAngle());
+        driveCartesian(0, power, 0, 0);
     }
 
-    public static void backward(double power){
-        driveCartesian(0, -power, 0, fieldAngle());
-    }
+    public static void backward(double power){ driveCartesian(0, -power, 0, 0); }
 
     public static void right(double power){
-        driveCartesian(power, 0, 0, fieldAngle());
+        driveCartesian(power, 0, 0, 0);
     }
 
     public static void left(double power){
-        driveCartesian(-power, 0, 0, fieldAngle());
+        driveCartesian(-power, 0, 0, 0);
     }
 
 

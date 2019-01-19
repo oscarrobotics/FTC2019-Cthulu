@@ -19,7 +19,6 @@ public class TeleOp2019 extends OscarBaseOp {
     public void init() {
         telemetry.addData("Status", "Initialized");
         super.init();
-        //waitForStart();
     }
 
     @Override
@@ -39,7 +38,6 @@ public class TeleOp2019 extends OscarBaseOp {
         NewMecanumDrive.teleopControl(gamepad1, lastGamepad1);
         Lift.teleopControl(gamepad2);
         Arm.teleopControl(gamepad2, lastGamepad2);
-        //telemetry.addLine("gamestickY: " + gamepad2.left_stick_y);
         telemetry.addLine("Elevator Target: " + Lift.getTargetPos());
         telemetry.addLine("Elevator Actual: " + Lift.getTargetPos());
         //telemetry.addLine("Dump Servo " );

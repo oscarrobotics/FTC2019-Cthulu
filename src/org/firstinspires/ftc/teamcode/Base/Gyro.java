@@ -49,10 +49,16 @@ public class Gyro extends OscarCommon {
         }
         return true;
     }
+    public static void reset() {
+//        Hardware.Sensors.imu.close();
+        init();
+        zero();
+    }
+
 
     public static void zero() {
-        update();
         TargetHeading = CurrentGyroHeading;
+        update();
     }
 
     public static double getZRotationRate() {
