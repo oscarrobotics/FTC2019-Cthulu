@@ -19,7 +19,7 @@ public class Arm extends OscarCommon {
     private static boolean yInDeadzone, lastYOutDeadzone, xInDeadzone;
     private static boolean yWasInDeadzone, xWasInDeadzone;
 
-    private static int holdPosition;
+    public static int holdPosition;
 
     private static BigMoveScoreState currentBmsState = BigMoveScoreState.IDLE;
     private static BigMoveGroundState currentBmgState = BigMoveGroundState.IDLE;
@@ -35,7 +35,7 @@ public class Arm extends OscarCommon {
 
     // extend/retract values
     private static final int ARM_X_MAX = -3400;
-    private static final int ARM_X_MIN = -775;
+    private static final int ARM_X_MIN = -50;
     private static final int ARM_X_SCORE = -3200;
     private static final int ARM_X_CRATER = -2600;
     private static final int ARM_X_MOVE_TOLERANCE = 25;
@@ -44,9 +44,9 @@ public class Arm extends OscarCommon {
 
     // raise/lower values
     private static final int ARM_Y_CRATER = -500;
-    private static final int ARM_Y_SCORE = -2350;
-    private static final int ARM_Y_MAX = -2400;
-    private static final int ARM_Y_MIN = 150;
+    private static final int ARM_Y_SCORE = -2400;
+    private static final int ARM_Y_MAX = -2450;
+    private static final int ARM_Y_MIN = 1000;//100
     private static final int ARM_Y_MOVE_TOLERANCE = 25;
     private static final double ARM_Y_UP_MULTIPLIER = 0.5;//1 equals full power
     private static final double ARM_Y_DOWN_MULTIPLIER = 0.2;//1 equals full power
@@ -267,7 +267,7 @@ public class Arm extends OscarCommon {
             ArmYStick *= (gamepad.left_stick_button ? (ARM_Y_DOWN_MULTIPLIER * ARM_Y_DOWN_BOOST) : ARM_Y_DOWN_MULTIPLIER);
         }
 
-        boolean inStateMachine = currentBmsState != BigMoveScoreState.IDLE;
+        boolean inStateMachine = currentBmsState != BigMoveScoreState.IDLE || currentBmgState != BigMoveGroundState.IDLE;
         if (!inStateMachine) {
             powerMoveArmX(ArmXStick);
             powerMoveArmY(ArmYStick);
@@ -305,7 +305,7 @@ public class Arm extends OscarCommon {
                 break;
             case X_RETRACT:
                 if (Math.abs(getYPos()) < 1800 || mBmsStateTime.milliseconds() > 1000) {
-                    if (moveArmX(ARM_X_MIN, 1)) {
+                    if (moveArmX(ARM_X_MAX/2, 1)) {
                         newBmsState(BigMoveScoreState.Y_RAISE);
                     }
                 } else {
@@ -314,6 +314,7 @@ public class Arm extends OscarCommon {
                 break;
             case Y_RAISE:
                 if (YScoreHeight() || mBmsStateTime.milliseconds() > 1000) {
+                    holdPosition = ARM_Y_SCORE;
                     newBmsState(BigMoveScoreState.X_EXTEND);
                 }
                 break;
@@ -343,6 +344,7 @@ public class Arm extends OscarCommon {
                 break;
             case Y_LOWER:
                 if (moveArmY(ARM_Y_CRATER, .5) || mBmgStateTime.milliseconds() > 1000) {
+                    holdPosition = ARM_Y_CRATER;
                     newBmgState(BigMoveGroundState.X_CRATER);
                 }
                 break;
