@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Base.NewMecanumDrive;
 import org.firstinspires.ftc.teamcode.Base.Pixy;
@@ -13,12 +14,15 @@ import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.State.*;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
 public class Autonomous2019 extends OscarBaseOp {
 
+    private static Gamepad lastGamepad1 = new Gamepad();
+
     private double speed = 0.0;
     public int distance;
     public int heading;
     public double depotAngle;
     private StartPosition lander = StartPosition.Depot;
     public Pixy.CubePosition cubePosition = Pixy.CubePosition.LEFT_CUBE;
+    public static int waitTime = 0;
 
     private int LEFT_CUBE_DISTANCE = 1500;
     private int LEFT_CUBE_CRATER_DISTANCE = 1500;
@@ -35,7 +39,7 @@ public class Autonomous2019 extends OscarBaseOp {
     private int RIGHT_CUBE_ANGLE = 65;
     private int RIGHT_CUBE_STRAFE = 1800;
 
-    private final double SPEED_MULTIPLIER = 0.7;
+    private final double SPEED_MULTIPLIER = 0.9;
     private final double DISTANCE_MULTIPLIER = 1.0;
 
     public enum StartPosition {
@@ -76,7 +80,6 @@ public class Autonomous2019 extends OscarBaseOp {
         STATE_LINEUP_MINERALS,
         STATE_HIT_MINERALS,
         STATE_DIFFERENTIATE_PATHS,
-        STATE_IDLE,
         STATE_STOP
     }
 
@@ -129,6 +132,7 @@ public class Autonomous2019 extends OscarBaseOp {
     public void init() {
         super.init();
         Pixy.init();
+        waitTime = 0;
     }
 
     @Override
@@ -150,10 +154,23 @@ public class Autonomous2019 extends OscarBaseOp {
                 break;
         }
 
-        if (gamepad1.dpad_up)
+        if (gamepad1.x)
             lander = StartPosition.Crater;
-        if (gamepad1.dpad_down)
+        if (gamepad1.y)
             lander = StartPosition.Depot;
+
+        if (!lastGamepad1.dpad_up && gamepad1.dpad_up)
+            waitTime += 250;
+        else if (!lastGamepad1.dpad_down && gamepad1.dpad_down)
+            waitTime -= 250;
+
+        if (waitTime < 0)
+            waitTime = 0;
+        telemetry.addLine("Wait Time: " + ((double)waitTime/1000));
+
+        try {
+            lastGamepad1.copy(gamepad1);
+        } catch(Exception ex) {}
     }
 
     public void loop() {
@@ -467,11 +484,11 @@ public class Autonomous2019 extends OscarBaseOp {
         switch (mCurrentMainState) {
             case STATE_INITIAL:
                 Pixy.update();
-                newState(STATE_DROP_FROM_LANDER);
+                newState(STATE_WAIT);
                 break;
 
             case STATE_WAIT:
-                if (mStateTime.milliseconds() >= 2000) {
+                if (mStateTime.milliseconds() >= waitTime) {
                     newState(STATE_DROP_FROM_LANDER);
                 }
                 break;

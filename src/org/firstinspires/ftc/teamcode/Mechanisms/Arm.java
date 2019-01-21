@@ -18,6 +18,7 @@ public class Arm extends OscarCommon {
     private static boolean lastLimitState, hasYZeroed;
     private static boolean yInDeadzone, lastYOutDeadzone, xInDeadzone;
     private static boolean yWasInDeadzone, xWasInDeadzone;
+    public static boolean inStateMachine;
 
     public static int holdPosition;
 
@@ -30,8 +31,8 @@ public class Arm extends OscarCommon {
     private static final double DUMP_OPEN = .10;
     private static final double DUMP_CLOSE = .85;
 
-    private static final int ARM_UP_TOLERANCE = 150;
-    private static final int ARM_DOWN_TOLERANCE = 120;
+    private static final int ARM_UP_TOLERANCE = 200;
+    private static final int ARM_DOWN_TOLERANCE = 150;
 
     // extend/retract values
     private static final int ARM_X_MAX = -3400;
@@ -39,15 +40,17 @@ public class Arm extends OscarCommon {
     private static final int ARM_X_SCORE = -3200;
     private static final int ARM_X_CRATER = -2600;
     private static final int ARM_X_MOVE_TOLERANCE = 25;
+    private static final int ARM_X_MOVE_STATE_TOLERANCE = 750;
     private static final double ARM_X_MULTIPLIER = 0.25;//1 equals full power
     private static final double ARM_X_MULTIPLIER_BOOOoST = 2.5;//1 equals 100% or normal multiplier power
 
     // raise/lower values
-    private static final int ARM_Y_CRATER = -500;
-    private static final int ARM_Y_SCORE = -2400;
-    private static final int ARM_Y_MAX = -2450;
-    private static final int ARM_Y_MIN = 1000;//100
+    private static final int ARM_Y_CRATER = -400;
+    private static final int ARM_Y_SCORE = -2450;
+    private static final int ARM_Y_MAX = -2550;
+    private static final int ARM_Y_MIN = 100;
     private static final int ARM_Y_MOVE_TOLERANCE = 25;
+    private static final int ARM_Y_MOVE_STATE_TOLERANCE = 750;
     private static final double ARM_Y_UP_MULTIPLIER = 0.5;//1 equals full power
     private static final double ARM_Y_DOWN_MULTIPLIER = 0.2;//1 equals full power
     private static final double ARM_Y_UP_BOOST = 1.5;
@@ -122,7 +125,7 @@ public class Arm extends OscarCommon {
     }
 
     private static void powerMoveArmY(double stickVal) {//when stick is outside of deadzone
-        if (yInDeadzone && lastYOutDeadzone) {
+       /* if (yInDeadzone && lastYOutDeadzone) {
             _telemetry.addData("Trying to hold position", stickVal);
         }
         else if (!yInDeadzone){
@@ -147,12 +150,38 @@ public class Arm extends OscarCommon {
             } else {
                 _telemetry.addData("Doing nothing without power", holdPosition);
             }
-        }
+        }*/
+
+       if (yInDeadzone && lastYOutDeadzone){
+           holdPosition = getYPos();
+           _telemetry.addData("Holding Position", holdPosition);
+       } else if (!yInDeadzone){
+           if (stickVal < 0){
+               moveArmY(ARM_Y_MAX, stickVal);
+               holdPosition = getYPos() - ARM_UP_TOLERANCE;
+               _telemetry.addData("Trying to move up", stickVal);
+           } else {
+               if (hasYZeroed) {
+                   moveArmY(ARM_Y_MIN, stickVal);
+                   holdPosition = getYPos() + ARM_DOWN_TOLERANCE;
+                   _telemetry.addData("Trying to move down", stickVal);
+               } else {
+                   moveArmY(10000, stickVal);
+                   holdPosition = getYPos();
+                   _telemetry.addData("Trying to move down", stickVal);
+               }
+           }
+       } else {
+           if (Math.abs(Math.abs(getYPos()) - Math.abs(holdPosition)) > 50) {
+               moveArmY(holdPosition, 1);
+               _telemetry.addData("Doing nothing with power", holdPosition);
+           } else {
+               _telemetry.addData("Doing nothing without power", holdPosition);
+           }
+       }
     }
 
     private static void powerMoveArmX(double power) {
-        SafetyOutput armSafety = armSafety(power, getXPos(), false);
-        _telemetry.addLine("X Safety: " + armSafety._isSafe + ", " + (armSafety._errorDirection == 1 ? "MAX" : "MIN"));
         if (!xInDeadzone) {
             xWasInDeadzone = false;
             if (power < 0) {
@@ -170,25 +199,28 @@ public class Arm extends OscarCommon {
     }
 
     private static boolean moveArmY(int setpoint, double power) {
-        if (armYTargetPos != setpoint) armYTargetPos = setpoint;
+        armYTargetPos = setpoint;
         if (hasYZeroed) {
             if (setpoint < ARM_Y_MAX) { setpoint = ARM_Y_MAX; }
             if (setpoint > ARM_Y_MIN) { setpoint = ARM_Y_MIN; }
         }
+
+        _telemetry.addLine("Arm Y Safety: " + armSafety(power, getYPos()));
+
         _intakeArmVertical.setTargetPosition(setpoint);
         _intakeArmVertical.setPower(power);
         int error = Math.abs(Math.abs(_intakeArmVertical.getCurrentPosition()) - Math.abs(setpoint));
-        return (error < ARM_Y_MOVE_TOLERANCE);
+        return (error <  (!inStateMachine ? ARM_Y_MOVE_TOLERANCE : ARM_Y_MOVE_STATE_TOLERANCE));
     }
 
     private static boolean moveArmX(int setpoint, double power) {
-        if (armXTargetPos != setpoint) armXTargetPos = setpoint;
+        armXTargetPos = setpoint;
         if (setpoint < ARM_X_MAX) { setpoint = ARM_X_MAX; }
         if (setpoint > ARM_X_MIN) { setpoint = ARM_X_MIN; }
         _intakeArmExtend.setTargetPosition(setpoint);
         _intakeArmExtend.setPower(power);
         int error = Math.abs(Math.abs(_intakeArmExtend.getCurrentPosition()) - Math.abs(setpoint));
-        return (error < ARM_X_MOVE_TOLERANCE);
+        return (error < (!inStateMachine ? ARM_X_MOVE_TOLERANCE : ARM_X_MOVE_STATE_TOLERANCE));
     }
 
     private static void update(){
@@ -202,47 +234,21 @@ public class Arm extends OscarCommon {
         lastLimitState = !_limitSwitch.getState();
     }
 
-    private static class SafetyOutput {
-        boolean _isSafe;
-        int _errorDirection;
-        int _errorAmount;
-
-        SafetyOutput(boolean isSafe, int errorDirection, int errorAmount) {
-            _isSafe = isSafe;
-            _errorDirection = errorDirection;
-            _errorAmount = errorAmount;
-        }
-
-        SafetyOutput(boolean isSafe) {
-            _isSafe = isSafe;
-            _errorDirection = 0;
-            _errorAmount = 0;
-        }
-    }
-
-    private static SafetyOutput armSafety(double power, int curPos, boolean isYArm) {
-        if (isYArm) {
+    private static boolean armSafety(double power, int curPos) {
             boolean limitSwitch = !_limitSwitch.getState();
             power *= -1;
-            if (limitSwitch && power < -.1) return new SafetyOutput(false, -1, 0);
-            if (limitSwitch && power > .1) return new SafetyOutput(true);
+            curPos *= -1;
+            if (limitSwitch && power < 0) return false;
+            if (limitSwitch && power > 0) return true;
             if (!hasYZeroed) {
-                return new SafetyOutput(!limitSwitch, -1, 0);
+                return true;
             } else {
-                if (power > .1)  {
-                    return new SafetyOutput(!(curPos <= ARM_Y_MAX), 1, Math.abs(Math.abs(ARM_Y_MAX) - Math.abs(curPos)));
-                } else if (power < -.1) {
-                    return new SafetyOutput(!(curPos >= ARM_Y_MIN), -1, Math.abs(Math.abs(ARM_Y_MIN) - Math.abs(curPos)));
-                } else return new SafetyOutput(true);
+                if (power > 0)  {
+                    return ((curPos >= ARM_Y_MAX - 500));
+                } else if (power < 0) {
+                    return (!(curPos <= ARM_Y_MIN));
+                } else return true;
             }
-        } else {
-            power *= -1;
-            if (power > .1)  {
-                return new SafetyOutput(!(curPos <= ARM_X_MAX), 1, Math.abs(Math.abs(ARM_X_MAX) - Math.abs(curPos)));
-            } else if (power < -.1) {
-                return new SafetyOutput(!(curPos >= ARM_X_MIN), 1, Math.abs(Math.abs(ARM_X_MIN) - Math.abs(curPos)));
-            } else return new SafetyOutput(true);
-        }
     }
 
     private static void updateTelemetry() {
@@ -267,7 +273,7 @@ public class Arm extends OscarCommon {
             ArmYStick *= (gamepad.left_stick_button ? (ARM_Y_DOWN_MULTIPLIER * ARM_Y_DOWN_BOOST) : ARM_Y_DOWN_MULTIPLIER);
         }
 
-        boolean inStateMachine = currentBmsState != BigMoveScoreState.IDLE || currentBmgState != BigMoveGroundState.IDLE;
+        inStateMachine = currentBmsState != BigMoveScoreState.IDLE || currentBmgState != BigMoveGroundState.IDLE;
         if (!inStateMachine) {
             powerMoveArmX(ArmXStick);
             powerMoveArmY(ArmYStick);
@@ -305,7 +311,7 @@ public class Arm extends OscarCommon {
                 break;
             case X_RETRACT:
                 if (Math.abs(getYPos()) < 1800 || mBmsStateTime.milliseconds() > 1000) {
-                    if (moveArmX(ARM_X_MAX/2, 1)) {
+                    if (XRetract()) {
                         newBmsState(BigMoveScoreState.Y_RAISE);
                     }
                 } else {
@@ -335,7 +341,9 @@ public class Arm extends OscarCommon {
                 newBmgState(BigMoveGroundState.Y_CLEAR_LANDER);
                 break;
             case Y_CLEAR_LANDER:
-                if(moveArmY(getYPos() + 500, .5) || mBmgStateTime.milliseconds() > 1000)
+                if(moveArmY(-2000, .5) || mBmgStateTime.milliseconds() > 1000){
+                    newBmgState(BigMoveGroundState.X_RETRACT);
+                }
                 break;
             case X_RETRACT:
                 if(XRetract() || mBmgStateTime.milliseconds() > 1000) {
@@ -351,7 +359,7 @@ public class Arm extends OscarCommon {
             case X_CRATER:
                 if(moveArmX(ARM_X_CRATER, .5) || mBmgStateTime.milliseconds() > 1000) {
                     newBmgState(BigMoveGroundState.IDLE);
-            }
+                }
                 break;
             case IDLE:
                 break;
@@ -380,7 +388,7 @@ public class Arm extends OscarCommon {
 
     private static boolean XExtend() { return moveArmX(ARM_X_SCORE, 1); }
 
-    private static boolean XRetract() { return moveArmX(ARM_X_CRATER, 0.5); }
+    private static boolean XRetract() { return moveArmX(-1600, 0.5); }
 
     private static void newBmsState(BigMoveScoreState newState) {
         currentBmsState = newState;
