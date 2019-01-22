@@ -55,21 +55,21 @@ public class MecanumDrive extends OscarCommon {
     public static void teleopDrive(Gamepad gamepad){
         boolean rotationCorrection = true;
 
-        double rotate = Math.pow(gamepad.left_stick_x, 3);
+        double rotateStick = Math.pow(gamepad.left_stick_x, 3);
         double rightStickX = gamepad.right_stick_x;
         double rightStickY = gamepad.right_stick_y;
 
         if (rotationCorrection) {
-            if (rotate == 0 && lastKnownRotJoy != 0.0) {
+            if (rotateStick == 0 && lastKnownRotJoy != 0.0) {
                 Gyro.TargetHeading = Gyro.CurrentGyroHeading;
             }
-            lastKnownRotJoy = rotate;
+            lastKnownRotJoy = rotateStick;
 
-            if (rotate != 0) {
-                Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (MaxIncrement * rotate)) % 360;
+            if (rotateStick != 0) {
+                Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (MaxIncrement * rotateStick)) % 360;
             }
         } else {
-            Rotation = rotate;
+            Rotation = rotateStick;
         }
 
         // DPad mDrive
@@ -94,12 +94,34 @@ public class MecanumDrive extends OscarCommon {
         Drive(Speed, Direction, Rotation, 0, rotationCorrection);
     }
 
-    protected static boolean Drive(double Speed, double direction, double rotation, int autoDistance, boolean rotationCorrection) {
+    protected static boolean Drive(double speed, double direction, double rotation, int autoDistance, boolean rotationCorrection) {
+        double x = Util.clipRange(speed);
+        double y = Util.clipRange(direction);
+        rotation = Util.clipRange(rotation);
+
+        double gyroAngle = Gyro.CurrentGyroHeading;
+
+        double cosA = Math.cos(Math.toRadians(gyroAngle));
+        double sinA = Math.sin(Math.toRadians(gyroAngle));
+        double x1 = x*cosA - y*sinA;
+        double y1 = x*sinA + y*cosA;
+
 
         if (rotation == 0) {
             rotation = Gyro.getCompensation();
         }
 
+        double[] wheelPowers = new double[4];
+        wheelPowers[0] = x1 + y1 + rotation;
+        wheelPowers[1] = -x1 + y1 - rotation;
+        wheelPowers[2] = -x1 + y1 + rotation;
+        wheelPowers[3] = x1 + y1 - rotation;
+        Util.normalizeInPlace(wheelPowers);
+
+        _frontLeft.setPower(wheelPowers[0]);
+        _frontRight.setPower(wheelPowers[1]);
+        _backLeft.setPower(wheelPowers[2]);
+        _backRight.setPower(wheelPowers[3]);
 
         if (autoDistance != 0 && TargetDestination == 0) {
             TargetDestination = _backLeft.getCurrentPosition() + autoDistance;
@@ -114,17 +136,6 @@ public class MecanumDrive extends OscarCommon {
         _telemetry.addLine()
                 .addData("Actual", _backLeft.getCurrentPosition())
                 .addData("Dest", TargetDestination);
-
-
-        final double v1 = Speed * Math.cos(direction) + rotation;
-        final double v2 = Speed * Math.sin(direction) - rotation;
-        final double v3 = Speed * Math.sin(direction) + rotation;
-        final double v4 = Speed * Math.cos(direction) - rotation;
-
-        _frontLeft.setPower(v1);
-        _frontRight.setPower(v2);
-        _backLeft.setPower(v3);
-        _backRight.setPower(v4);
 
         if ((TargetDestination != 0 && Math.abs(_backLeft.getCurrentPosition() - TargetDestination) < 100)
                 || (direction == 0) && (Math.abs(Gyro.TargetHeading - Gyro.CurrentGyroHeading) <= 3) ) {

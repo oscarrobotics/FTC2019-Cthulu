@@ -216,9 +216,9 @@ public class AutoStates extends BaseOp {
            case STATE_SCAN_MINERALS:
                 speed = .4;
                 if (cubePosition == CubePosition.Left || cubePosition == CubePosition.Unknown){
-                    distance = 2350;
+                    distance = 2400;
                     depotAngle = 110;
-                    strafeDistance = 600;
+                    strafeDistance = 1100;
                     if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
                         if (lander == StartPosition.Depot){
                             newState(STATE_TURN_TO_DEPOT);
@@ -228,9 +228,9 @@ public class AutoStates extends BaseOp {
                     }
                 }
                 else if (cubePosition == CubePosition.Center){
-                    distance = 1050;
+                    distance = 1100;
                     depotAngle = 90;
-                    strafeDistance = 1400;
+                    strafeDistance = 1900;
                     if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
                         if (lander == StartPosition.Depot){
                             newState(STATE_TURN_TO_DEPOT);
@@ -242,12 +242,12 @@ public class AutoStates extends BaseOp {
                 else if (cubePosition == CubePosition.Right){
                     distance = 1;
                     depotAngle = 70;
-                    strafeDistance = 2000;
+                    strafeDistance = 2500;
                     if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
                         if (lander == StartPosition.Depot){
                             newState(STATE_TURN_TO_DEPOT);
                         } else
-                            newState(STATE_TURN_TO_DEPOT);;//STATE_HIT_CUBE
+                            newState(STATE_TURN_TO_DEPOT);//STATE_HIT_CUBE
                         MecanumDrive(0, 0, 0, 0);
                     }
                 }
@@ -272,11 +272,11 @@ public class AutoStates extends BaseOp {
 
            case STATE_DRIVE_TO_DEPOT:
                if (lander == StartPosition.Depot){
-                   distance = 2000;
+                   distance = 2500;
                    speed = .5;
                } else
                    speed = .25;
-                   distance = 1000;
+                   distance = 2500;
 
                if (MecanumDrive(speed, backwardMove(speed), 0, -distance)){
                    if (lander == StartPosition.Depot){
@@ -319,7 +319,7 @@ public class AutoStates extends BaseOp {
 
             case STATE_CLEAR_WALL:
                 speed = .5;
-                if (MecanumDrive(speed, rightMove(speed), 0, 400)){
+                if (MecanumDrive(speed, rightMove(speed), 0, 500)){
                     intakeCollect.setPower(0.0);
                     newState(STATE_DRIVE_TO_CRATER);
                     MecanumDrive(0, 0, 0, 0);
@@ -336,7 +336,7 @@ public class AutoStates extends BaseOp {
 
             case STATE_FLUSH_WALL:
                 speed = .5;
-                if (MecanumDrive(speed, leftMove(speed), 0, -600)){
+                if (MecanumDrive(speed, leftMove(speed), 0, -1000)){
                     intakeCollect.setPower(0.0);
                     newState(STATE_APPROACH_CRATER);
                     MecanumDrive(0, 0, 0, 0);

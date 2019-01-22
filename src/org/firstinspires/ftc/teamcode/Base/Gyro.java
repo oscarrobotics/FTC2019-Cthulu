@@ -1,18 +1,27 @@
 package org.firstinspires.ftc.teamcode.Base;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 public class Gyro extends OscarCommon {
     public static BNO055IMU.Parameters gyroParams;
     public static Orientation angles;
     public static Acceleration gravity;
+    public static AngularVelocity velocity;
 
     public static double TargetHeading = 0.0;
     public static double CurrentGyroHeading = 0.0;
+    public static double LastGyroHeading = 0.0;
+
+    public static final double kP = 0.025;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kEpsilon = 1;
+
+    private static double rotateValue;
+
+    private static MiniPID gyroPid;
 
     public static boolean init(){
         try {
@@ -29,6 +38,10 @@ public class Gyro extends OscarCommon {
             // Gyro stuff
             ////NEGATIVE = clockwise
             Hardware.Sensors.imu.initialize(gyroParams);
+
+            gyroPid = new MiniPID(kP, kI, kD);
+            gyroPid.setOutputLimits(-1.0, 1.0);
+
             _telemetry.addLine("initialized");
         }
         catch (Exception ex) {
@@ -36,10 +49,38 @@ public class Gyro extends OscarCommon {
         }
         return true;
     }
+    public static void reset() {
+//        Hardware.Sensors.imu.close();
+        init();
+        zero();
+    }
+
 
     public static void zero() {
-        update();
         TargetHeading = CurrentGyroHeading;
+        update();
+    }
+
+    public static double getZRotationRate() {
+        return velocity.yRotationRate;
+    }
+
+    public static void setPidSetpoint(int degree) {
+        TargetHeading = degree;
+    }
+
+    public static double pidCompensation() {
+        return gyroPid.getOutput(CurrentGyroHeading, TargetHeading);
+    }
+
+    public static double compensate(double rotateStick, double lastRotateStick){
+        if (Math.abs(rotateStick) == 0 && Math.abs(lastRotateStick) != 0) {
+            Gyro.TargetHeading = (Gyro.CurrentGyroHeading + (100 * rotateStick)) % 360;
+            rotateValue = Gyro.getCompensation();
+        } else {
+            rotateValue = rotateStick;
+        }
+        return rotateValue;
     }
 
     protected static double getCompensation(boolean isTurning) {
@@ -47,9 +88,10 @@ public class Gyro extends OscarCommon {
         double gyro = CurrentGyroHeading;
         double target = TargetHeading;
         double posError = gyro - target;
-        double epsilon = 3;
-        double minSpeed = isTurning?.45:.2; // was 0.12
-        double maxSpeed = 1;
+        double epsilon = 5;//3
+        double minSpeed = isTurning?.4:.3;
+        double maxSpeed = 0.5;//1
+
 
         if (Math.abs(posError) > 180) {
             posError = -360 * Math.signum(posError) + posError;
@@ -58,7 +100,10 @@ public class Gyro extends OscarCommon {
             rotation = minSpeed + (Math.abs(posError) / 180) * (maxSpeed - minSpeed);
             rotation = rotation * Math.signum(posError);
         }
-        return -rotation;
+
+        _telemetry.addData("Gyro Output", rotation);
+
+        return rotation;
     }
 
     protected static double getCompensation() {
@@ -66,7 +111,10 @@ public class Gyro extends OscarCommon {
     }
 
     public static void update() {
-        angles = Hardware.Sensors.imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
-        CurrentGyroHeading = angles.firstAngle;
+        angles = Hardware.Sensors.imu.getAngularOrientation(
+                AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+        gravity = Hardware.Sensors.imu.getGravity();
+        velocity = Hardware.Sensors.imu.getAngularVelocity();
+        CurrentGyroHeading = angles.thirdAngle;
     }
 }
