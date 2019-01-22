@@ -108,7 +108,7 @@ public class Arm extends OscarCommon {
         _intakeArmExtend.setMode(RUN_TO_POSITION);
     }
 
-    private static int getYPos() {
+    public static int getYPos() {
         return _intakeArmVertical.getCurrentPosition();
     }
 

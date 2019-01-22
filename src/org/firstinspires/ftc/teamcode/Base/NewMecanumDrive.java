@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Base;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 
 public class NewMecanumDrive extends OscarCommon{
 
@@ -13,9 +14,10 @@ public class NewMecanumDrive extends OscarCommon{
     private static int AutoTargetPos = 0;
     private static int AutoCurrentPos = 0;
     private static int AutoStartPos = 0;
-    private static final int AUTO_MOVE_TOLERANCE = 100;
+    private static final int AUTO_MOVE_TOLERANCE = 50;
 
     private static final double ROTATE_SPEED_MULTIPLIER = 1.2;
+    private static final double ROTATE_SPEED_EXTENDED_MULTIPLIER = 0.6;
     private static final double DRIVE_SPEED_MULTIPLIER = .9;
 
     public static void init() {
@@ -102,7 +104,7 @@ public class NewMecanumDrive extends OscarCommon{
     public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
         boolean leftStickTranslationalDrive = true;
 
-        double rotateStick = leftStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
+        double rotateStick = leftStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x * (Arm.getXPos() < -1600 && Arm.getYPos() > -600 ? ROTATE_SPEED_EXTENDED_MULTIPLIER : ROTATE_SPEED_MULTIPLIER);
         double lastRotateStick = leftStickTranslationalDrive ? lastGamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
         double rightStickX = leftStickTranslationalDrive ? gamepad.right_stick_x : gamepad.left_stick_x* DRIVE_SPEED_MULTIPLIER;
         double rightStickY = leftStickTranslationalDrive ? -gamepad.right_stick_y : -gamepad.left_stick_y* DRIVE_SPEED_MULTIPLIER;
