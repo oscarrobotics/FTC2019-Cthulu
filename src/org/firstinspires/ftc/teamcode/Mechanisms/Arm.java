@@ -19,6 +19,7 @@ public class Arm extends OscarCommon {
     private static boolean yInDeadzone, lastYOutDeadzone, xInDeadzone;
     private static boolean yWasInDeadzone, xWasInDeadzone;
     public static boolean inStateMachine;
+    public static boolean isDone = false;
 
     public static int holdPosition;
 
@@ -48,7 +49,7 @@ public class Arm extends OscarCommon {
     private static final int ARM_Y_CRATER = -400;
     private static final int ARM_Y_SCORE = -2450;
     private static final int ARM_Y_MAX = -2550;
-    private static final int ARM_Y_MIN = 100;
+    private static final int ARM_Y_MIN = 200;
     private static final int ARM_Y_MOVE_TOLERANCE = 25;
     private static final int ARM_Y_MOVE_STATE_TOLERANCE = 750;
     private static final double ARM_Y_UP_MULTIPLIER = 0.5;//1 equals full power
@@ -108,7 +109,7 @@ public class Arm extends OscarCommon {
         _intakeArmExtend.setMode(RUN_TO_POSITION);
     }
 
-    private static int getYPos() {
+    public static int getYPos() {
         return _intakeArmVertical.getCurrentPosition();
     }
 
@@ -125,33 +126,6 @@ public class Arm extends OscarCommon {
     }
 
     private static void powerMoveArmY(double stickVal) {//when stick is outside of deadzone
-       /* if (yInDeadzone && lastYOutDeadzone) {
-            _telemetry.addData("Trying to hold position", stickVal);
-        }
-        else if (!yInDeadzone){
-            if (stickVal < 0) {
-                moveArmY(ARM_Y_MAX, stickVal);
-                _telemetry.addData("Trying to move up", stickVal);
-                holdPosition = getYPos() - ARM_UP_TOLERANCE;
-            } else {
-                holdPosition = getYPos() + ARM_DOWN_TOLERANCE;
-                if (hasYZeroed) {
-                    moveArmY(ARM_Y_MIN, stickVal);
-                    _telemetry.addData("Trying to move down", stickVal);
-                } else {
-                    moveArmY(10000, stickVal);
-                    _telemetry.addData("Trying to move down", stickVal);
-                }
-            }
-        } else {
-            if (Math.abs(Math.abs(getYPos()) - Math.abs(holdPosition)) > 50) {
-                moveArmY(holdPosition, 1);
-                _telemetry.addData("Doing nothing with power", holdPosition);
-            } else {
-                _telemetry.addData("Doing nothing without power", holdPosition);
-            }
-        }*/
-
        if (yInDeadzone && lastYOutDeadzone){
            holdPosition = getYPos();
            _telemetry.addData("Holding Position", holdPosition);
@@ -198,7 +172,7 @@ public class Arm extends OscarCommon {
         }
     }
 
-    private static boolean moveArmY(int setpoint, double power) {
+    public static boolean moveArmY(int setpoint, double power) {
         armYTargetPos = setpoint;
         if (hasYZeroed) {
             if (setpoint < ARM_Y_MAX) { setpoint = ARM_Y_MAX; }
@@ -213,7 +187,7 @@ public class Arm extends OscarCommon {
         return (error <  (!inStateMachine ? ARM_Y_MOVE_TOLERANCE : ARM_Y_MOVE_STATE_TOLERANCE));
     }
 
-    private static boolean moveArmX(int setpoint, double power) {
+    public static boolean moveArmX(int setpoint, double power) {
         armXTargetPos = setpoint;
         if (setpoint < ARM_X_MAX) { setpoint = ARM_X_MAX; }
         if (setpoint > ARM_X_MIN) { setpoint = ARM_X_MIN; }
@@ -291,9 +265,9 @@ public class Arm extends OscarCommon {
          }
 
          if (gamepad.right_trigger > 0.1){
-             succ(gamepad.right_trigger);
+             succ(gamepad.right_trigger * 0.9);
          } else if (gamepad.left_trigger > 0.1){
-             unSucc(gamepad.left_trigger);
+             unSucc(gamepad.left_trigger * 0.75);
          } else {
              _intakeCollect.setPower(0.0);
          }
@@ -390,6 +364,42 @@ public class Arm extends OscarCommon {
 
     private static boolean XRetract() { return moveArmX(-1600, 0.5); }
 
+    public static boolean zeroY(){
+        moveArmX(-1200, 0.5);
+        _telemetry.addData("Limit: ", !_limitSwitch.getState());
+        if (!_limitSwitch.getState()){
+            update();
+            return true;
+        } else {
+            moveArmY(2000, 0.5);
+            return false;
+        }
+    }
+
+    public static boolean autoScoreGold(){
+        if (moveArmY(ARM_Y_SCORE,0.5) && moveArmX(ARM_X_SCORE, 0.5)){
+            return true;
+        } else return false;
+    }
+
+    public static  boolean return1(){
+        if (Arm.moveArmY(-2000, 0.5)) {
+            if (Arm.moveArmX(-1600, 0.5)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static  boolean return2(){
+        if (Arm.moveArmY(-600, 0.5)) {
+            if (Arm.moveArmX(0, 0.5)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void newBmsState(BigMoveScoreState newState) {
         currentBmsState = newState;
         mBmsStateTime.reset();
@@ -400,5 +410,10 @@ public class Arm extends OscarCommon {
         currentBmgState = newState;
         mBmgStateTime.reset();
         _telemetry.addData("BGS State:", newState);
+    }
+
+    public static void stop(){
+        _intakeArmVertical.setPower(0);
+        _intakeArmExtend.setPower(0);
     }
 }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Base;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 
 public class NewMecanumDrive extends OscarCommon{
 
@@ -16,6 +17,7 @@ public class NewMecanumDrive extends OscarCommon{
     private static final int AUTO_MOVE_TOLERANCE = 100;
 
     private static final double ROTATE_SPEED_MULTIPLIER = 1.2;
+    private static final double ROTATE_SPEED_EXTENDED_MULTIPLIER = 0.25;
     private static final double DRIVE_SPEED_MULTIPLIER = .9;
 
     public static void init() {
@@ -102,12 +104,53 @@ public class NewMecanumDrive extends OscarCommon{
     public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
         boolean leftStickTranslationalDrive = true;
 
-        double rotateStick = leftStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
+        double rotateStick = (leftStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x);
         double lastRotateStick = leftStickTranslationalDrive ? lastGamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
         double rightStickX = leftStickTranslationalDrive ? gamepad.right_stick_x : gamepad.left_stick_x* DRIVE_SPEED_MULTIPLIER;
         double rightStickY = leftStickTranslationalDrive ? -gamepad.right_stick_y : -gamepad.left_stick_y* DRIVE_SPEED_MULTIPLIER;
 
-        if (gamepad.y && !lastGamepad.y) {
+        if ((Arm.getYPos() > -500 || Arm.getYPos() < -2300) && Arm.getXPos() < -1600)
+            rotateStick *= ROTATE_SPEED_EXTENDED_MULTIPLIER;
+        else if ((Arm.getYPos() > -550 || Arm.getYPos() < -2350) && Arm.getXPos() < -1525)
+            rotateStick *= 0.3;
+        else if ((Arm.getYPos() > -600 || Arm.getYPos() < -2300) && Arm.getXPos() < -1450)
+            rotateStick *= 0.35;
+        else if ((Arm.getYPos() > -650 || Arm.getYPos() < -2250) && Arm.getXPos() < -1375)
+            rotateStick *= 0.4;
+        else if ((Arm.getYPos() > -700 || Arm.getYPos() < -2200) && Arm.getXPos() < -1300)
+            rotateStick *= 0.45;
+        else if ((Arm.getYPos() > -750 || Arm.getYPos() < -2150) && Arm.getXPos() < -1225)
+            rotateStick *= 0.5;
+        else if ((Arm.getYPos() > -800 || Arm.getYPos() < -2100) && Arm.getXPos() < -1150)
+            rotateStick *= 0.55;
+        else if ((Arm.getYPos() > -850 || Arm.getYPos() < -2050) && Arm.getXPos() < -1075)
+            rotateStick *= 0.6;
+        else if ((Arm.getYPos() > -900 || Arm.getYPos() < -2000) && Arm.getXPos() < -1000)
+            rotateStick *= 0.65;
+        else if ((Arm.getYPos() > -950 || Arm.getYPos() < -1950) && Arm.getXPos() < -925)
+            rotateStick *= 0.7;
+        else if ((Arm.getYPos() > -1000 || Arm.getYPos() < -1900) && Arm.getXPos() < -850)
+            rotateStick *= 0.75;
+        else if ((Arm.getYPos() > -1050 || Arm.getYPos() < -1850) && Arm.getXPos() < -775)
+            rotateStick *= 0.8;
+        else if ((Arm.getYPos() > -1100 || Arm.getYPos() < -1800) && Arm.getXPos() < -700)
+            rotateStick *= 0.85;
+        else if ((Arm.getYPos() > -1150 || Arm.getYPos() < -1750) && Arm.getXPos() < -625)
+            rotateStick *= 0.9;
+        else if ((Arm.getYPos() > -1200 || Arm.getYPos() < -1700) && Arm.getXPos() < -550)
+            rotateStick *= 0.95;
+        else if ((Arm.getYPos() > -1250 || Arm.getYPos() < -1650) && Arm.getXPos() < -475)
+            rotateStick *= 1.0;
+        else if ((Arm.getYPos() > -1300 || Arm.getYPos() < -1600) && Arm.getXPos() < -400)
+            rotateStick *= 1.05;
+        else if ((Arm.getYPos() > -1350 || Arm.getYPos() < -1550) && Arm.getXPos() < -325)
+            rotateStick *= 1.1;
+        else if ((Arm.getYPos() > -1400 || Arm.getYPos() < -1500) && Arm.getXPos() < -250)
+            rotateStick *= 1.15;
+        else
+            rotateStick *= ROTATE_SPEED_MULTIPLIER;
+
+            if (gamepad.y && !lastGamepad.y) {
             isFieldOriented = !isFieldOriented;
             Gyro.reset();
         }
@@ -118,13 +161,13 @@ public class NewMecanumDrive extends OscarCommon{
 
         if (gamepad.dpad_up || gamepad.dpad_down || gamepad.dpad_left || gamepad.dpad_right) {
             if (gamepad.dpad_down) { // backwards
-                backward(gamepad.right_bumper ? .2 : 0.4);
+                backward(gamepad.left_bumper ? .2 : 0.4);
             } else if (gamepad.dpad_left) { // left
-                left(gamepad.right_bumper ? .3 : 0.5);
+                left(gamepad.left_bumper ? .3 : 0.5);
             } else if (gamepad.dpad_up) { // forwards
-                forward(gamepad.right_bumper ? .2 : 0.4);
+                forward(gamepad.left_bumper ? .2 : 0.4);
             } else { // right
-                right(gamepad.right_bumper ? .3 : 0.5);
+                right(gamepad.left_bumper ? .3 : 0.5);
             }
         } else {
             driveCartesian(rightStickX, rightStickY, rotateStick, fieldAngle());

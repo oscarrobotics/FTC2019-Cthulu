@@ -7,36 +7,36 @@ import org.firstinspires.ftc.teamcode.Base.Pixy;
 import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
 
-import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.CraterState.*;
-import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.DepotState.*;
-import static org.firstinspires.ftc.teamcode.OpModes.Autonomous2019.State.*;
+import static org.firstinspires.ftc.teamcode.OpModes.TestAutonomous.CraterState.*;
+import static org.firstinspires.ftc.teamcode.OpModes.TestAutonomous.DepotState.*;
+import static org.firstinspires.ftc.teamcode.OpModes.TestAutonomous.State.*;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Oscar: AutoStates2019", group = "Oscar")
-public class Autonomous2019 extends OscarBaseOp {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "TEST AutoStates", group = "Oscar")
+public class TestAutonomous extends OscarBaseOp {
 
     private static Gamepad lastGamepad1 = new Gamepad();
 
     private double speed = 0.0;
     public int distance;
     public int heading;
-    public double depotAngle;
+    public int depotAngle, goldAngle;
     private StartPosition lander = StartPosition.Depot;
     public Pixy.CubePosition cubePosition = Pixy.CubePosition.LEFT_CUBE;
     public static int waitTime = 0;
 
     private int LEFT_CUBE_DISTANCE = 1500;
     private int LEFT_CUBE_CRATER_DISTANCE = 1500;
-    private int LEFT_CUBE_ANGLE = 105;
+    private int LEFT_CUBE_ANGLE = 55;
     private int LEFT_CUBE_STRAFE = 600;
 
     private int CENTER_CUBE_DISTANCE = 300;
     private int CENTER_CUBE_CRATER_DISTANCE = 350;
-    private int CENTER_CUBE_ANGLE = 85;
+    private int CENTER_CUBE_ANGLE = 90;
     private int CENTER_CUBE_STRAFE = 1000;
 
     private int RIGHT_CUBE_DISTANCE = 1100;
     private int RIGHT_CUBE_CRATER_DISTANCE = 850;
-    private int RIGHT_CUBE_ANGLE = 65;
+    private int RIGHT_CUBE_ANGLE = 125;
     private int RIGHT_CUBE_STRAFE = 1800;
 
     private final double SPEED_MULTIPLIER = 0.9;
@@ -76,26 +76,30 @@ public class Autonomous2019 extends OscarBaseOp {
         STATE_DROP_FROM_LANDER,
         STATE_DETACH_LANDER,
         STATE_STRAFE_RIGHT,
-        STATE_CLEAR_LANDER,
-        STATE_LINEUP_MINERALS,
-        STATE_HIT_MINERALS,
+        STATE_TURN_TO_MINERALS,
+        STATE_ZERO_ARM,
+        STATE_TURN_TO_GOLD,
         STATE_DIFFERENTIATE_PATHS,
         STATE_STOP
     }
 
     public enum DepotState {
         DS_INITIAL,
-        DS_TURN_TO_DEPOT,
-        DS_DRIVE_TO_DEPOT,
+        DS_PREPARE_ARM,
         DS_EJECT_MARKER,
+        DS_RETURN_ARM,
+        DS_CENTER_MINERALS,
+        DS_TURN_TO_GOLD,
+        DS_PREPARE_INTAKE,
+        DS_INTAKE_GOLD,
+        DS_BACK,
+        DS_LINEUP_SCORE,
+        DS_TURN_SCORE,
+        DS_SCORE_ARM,
+        DS_MOVE_SCORE,
+        DS_PREPARE_MOVEMENT,
         DS_TURN_TO_CRATER,
-        DS_STRAFE_TO_WALL1,
-        DS_CLEAR_WALL,
-        DS_DRIVE_TO_CRATER1,
-        DS_STRAFE_TO_WALL2,
-        DS_CLEAR_WALL2,
-        DS_DRIVE_TO_CRATER2,
-        DS_STRAFE_TO_WALL3,
+        DS_DRIVE_TO_CRATER,
         DS_APPROACH_CRATER,
         DS_STOP
     }
@@ -345,130 +349,146 @@ public class Autonomous2019 extends OscarBaseOp {
         switch (mCurrentDepotState) {
             case DS_INITIAL:
                 NewMecanumDrive.stop();
-                newDepotState(DS_TURN_TO_DEPOT);
-                break;
-            case DS_TURN_TO_DEPOT:
-                if (NewMecanumDrive.turn(-depotAngle)){
-                    NewMecanumDrive.stop();
-                    newDepotState(DS_DRIVE_TO_DEPOT);
-                }
+                newDepotState(DS_PREPARE_ARM);
                 break;
 
-            case DS_DRIVE_TO_DEPOT:
-                switch (cubePosition) {
-                    case UNKNOWN_CUBE:
-                    case LEFT_CUBE:
-                        distance = 2800;
-                        heading = -LEFT_CUBE_ANGLE;
-                        break;
-                    case CENTER_CUBE:
-                        distance = 2300;
-                        heading = -CENTER_CUBE_ANGLE;
-                        break;
-                    case RIGHT_CUBE:
-                        distance = 2500;
-                        heading = -RIGHT_CUBE_ANGLE;
-                        break;
-                }
-                distance = (int) (distance * DISTANCE_MULTIPLIER);
-                speed = .5 * SPEED_MULTIPLIER;
-                if (NewMecanumDrive.forward(speed, distance, heading)) {
-                    NewMecanumDrive.stop();
-                    newDepotState(DS_EJECT_MARKER);
+            case DS_PREPARE_ARM:
+                if (Arm.moveArmY(-500, 0.5)) {
+                    if (Arm.moveArmX(-3000, 0.5) && mDepotStateTime.milliseconds() > 2000) {
+                        Arm.stop();
+                        newDepotState(DS_EJECT_MARKER);
+                    }
                 }
                 break;
 
             case DS_EJECT_MARKER:
                 Arm.autoIntake(-1);
-                if (mDepotStateTime.milliseconds() >= 3000) {
+                if (mDepotStateTime.milliseconds() >= 2000) {
                     Arm.autoIntake(0);
-                    newDepotState(DS_TURN_TO_CRATER);
+                    newDepotState(DS_RETURN_ARM);
                 }
                 break;
 
-            case DS_TURN_TO_CRATER:
-                if (NewMecanumDrive.turn(-135)){
+            case DS_RETURN_ARM:
+                if (Arm.moveArmX(-1200, 0.5)) {
+                    if (NewMecanumDrive.backward(0.5, 400, -90)) {
+                        Arm.stop();
+                        NewMecanumDrive.stop();
+                        newDepotState(DS_CENTER_MINERALS);
+                    }
+                }
+                break;
+
+            case DS_CENTER_MINERALS:
+                speed = .5 * SPEED_MULTIPLIER;
+                distance = (int) (100 * DISTANCE_MULTIPLIER);
+                if (NewMecanumDrive.left(speed, distance, -90)){
                     NewMecanumDrive.stop();
-                    newDepotState(DS_STRAFE_TO_WALL1);
+                    newDepotState(DS_TURN_TO_GOLD);
                 }
                 break;
 
-            case DS_STRAFE_TO_WALL1:
-                speed = .75 * SPEED_MULTIPLIER;
+            case DS_TURN_TO_GOLD:
                 switch (cubePosition){
                     case UNKNOWN_CUBE:
                     case LEFT_CUBE:
-                        distance = LEFT_CUBE_STRAFE;
+                        goldAngle = LEFT_CUBE_ANGLE;
+                        break;
                     case CENTER_CUBE:
-                        distance = CENTER_CUBE_STRAFE;
+                        goldAngle = CENTER_CUBE_ANGLE;
+                        break;
                     case RIGHT_CUBE:
-                        distance = RIGHT_CUBE_STRAFE;
+                        goldAngle = RIGHT_CUBE_ANGLE;
+                        break;
                 }
-                distance = (int) (distance * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.left(speed, distance, -135)) {
+                if (NewMecanumDrive.turn(-goldAngle)){
                     NewMecanumDrive.stop();
-                    newDepotState(DS_CLEAR_WALL);
+                    newDepotState(DS_PREPARE_INTAKE);
                 }
                 break;
 
-            case DS_CLEAR_WALL:
-                speed = .75 * SPEED_MULTIPLIER;
-                distance = (int) (300 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, -135)) {
-                    NewMecanumDrive.stop();
-                    newDepotState(DS_DRIVE_TO_CRATER1);
+            case DS_PREPARE_INTAKE:
+                if (Arm.zeroY()) {
+                    Arm.stop();
+                    newDepotState(DS_INTAKE_GOLD);
                 }
                 break;
 
-            case DS_DRIVE_TO_CRATER1:
-                speed = .5 * SPEED_MULTIPLIER;
-                distance = (int) (700 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, -135)) {
-                    NewMecanumDrive.stop();
-                    newDepotState(DS_STRAFE_TO_WALL2);
-                }
-                break;
-
-            case DS_STRAFE_TO_WALL2:
-                speed = .75 * SPEED_MULTIPLIER;
-                distance = (int) (600 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.left(speed, distance, -135)) {
-                    NewMecanumDrive.stop();
-                    newDepotState(DS_CLEAR_WALL2);
-                }
-                break;
-
-            case DS_CLEAR_WALL2:
-                speed = .75 * SPEED_MULTIPLIER;
+            case DS_INTAKE_GOLD:
+                Arm.autoIntake(1);
+                speed = .2 * SPEED_MULTIPLIER;
                 distance = (int) (200 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, -135)) {
+                if (NewMecanumDrive.forward(speed, distance, -goldAngle) && mDepotStateTime.milliseconds() > 2000){
                     NewMecanumDrive.stop();
-                    newDepotState(DS_DRIVE_TO_CRATER2);
+                    newDepotState(DS_BACK);
                 }
                 break;
 
-            case DS_DRIVE_TO_CRATER2:
+            case DS_BACK:
+                if (NewMecanumDrive.backward(0.25, 200, -goldAngle)){
+                    NewMecanumDrive.stop();
+                    newDepotState(DS_LINEUP_SCORE);
+                }
+
+            case DS_LINEUP_SCORE:
                 speed = .5 * SPEED_MULTIPLIER;
-                distance = (int) (2500 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, -133)) {//-135
-                    NewMecanumDrive.stop();
-                    newDepotState(DS_STRAFE_TO_WALL3);
+                distance = (int) (200 * DISTANCE_MULTIPLIER);
+                if (NewMecanumDrive.backward(speed, distance, -90)){
+                    if (Arm.moveArmX(-1600, 0.5)){
+                        Arm.autoIntake(0);
+                        NewMecanumDrive.stop();
+                        Arm.stop();
+                        newDepotState(DS_SCORE_ARM);
+                    }
                 }
                 break;
 
-            case DS_STRAFE_TO_WALL3:
-                speed = .75 * SPEED_MULTIPLIER;
-                distance = (int) (300 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.left(speed, distance, -135)) {
+            case DS_SCORE_ARM:
+                if (Arm.autoScoreGold() || mDepotStateTime.milliseconds() >= 3000){
+                    Arm.stop();
+                    newDepotState(DS_MOVE_SCORE);
+                }
+                break;
+
+            case DS_MOVE_SCORE:
+                speed = .2 * SPEED_MULTIPLIER;
+                distance = (int) (600 * DISTANCE_MULTIPLIER);
+                if (NewMecanumDrive.backward(speed, distance, -90) || mDepotStateTime.milliseconds() >= 2000){
+                    Arm.autoIntake(1);
                     NewMecanumDrive.stop();
-                    newDepotState(DS_APPROACH_CRATER);
+                    newDepotState(DS_PREPARE_MOVEMENT);
+                }
+                break;
+
+            case DS_PREPARE_MOVEMENT:
+                if (Arm.return1() || mDepotStateTime.milliseconds() >= 3000){
+                    Arm.stop();
+                    if (NewMecanumDrive.forward(0.3, 400, 0)) {
+                        NewMecanumDrive.stop();
+                        Arm.autoIntake(0);
+                        Arm.stop();
+                        newDepotState(DS_DRIVE_TO_CRATER);
+                    }
+                }
+                break;
+
+            case DS_DRIVE_TO_CRATER:
+                speed = .5 * SPEED_MULTIPLIER;
+                distance = (int) (200 * DISTANCE_MULTIPLIER);
+                if (NewMecanumDrive.forward(speed, distance, 45)) {
+                    if (Arm.return2()){
+                        NewMecanumDrive.stop();
+                        Arm.stop();
+                        newDepotState(DS_STOP);
+                    }
+
                 }
                 break;
 
             case DS_APPROACH_CRATER:
                 speed = .25 * SPEED_MULTIPLIER;
-                distance = (int) (1000 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, -135)) {
+                distance = (int) (2000 * DISTANCE_MULTIPLIER);
+                if (NewMecanumDrive.forward(speed, distance, 45)) {
                     NewMecanumDrive.stop();
                     newDepotState(DS_STOP);
                 }
@@ -503,7 +523,7 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_DETACH_LANDER:
                 speed = .3 * SPEED_MULTIPLIER;
-                distance = (int) (100 * DISTANCE_MULTIPLIER);
+                distance = (int) (300 * DISTANCE_MULTIPLIER);
 
                 if (NewMecanumDrive.backward(speed, distance, 0) || mStateTime.milliseconds() >= 2000){
                     NewMecanumDrive.stop();
@@ -513,78 +533,25 @@ public class Autonomous2019 extends OscarBaseOp {
 
             case STATE_STRAFE_RIGHT:
                 speed = .6 * SPEED_MULTIPLIER;
-                distance = (int) (175 * DISTANCE_MULTIPLIER);
+                distance = (int) (1200 * DISTANCE_MULTIPLIER);
                 if (NewMecanumDrive.right(speed, distance, 0)){
                     NewMecanumDrive.stop();
-                    newState(STATE_CLEAR_LANDER);
+                    newState(STATE_TURN_TO_MINERALS);
                 }
                 break;
 
-            case STATE_CLEAR_LANDER:
-                speed = .3 * SPEED_MULTIPLIER;
-                distance = (int) (450 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, 0)){
+
+            case STATE_TURN_TO_MINERALS:
+                if (NewMecanumDrive.turn(-90)){
                     NewMecanumDrive.stop();
-                    newState(STATE_LINEUP_MINERALS);
+                    newState(STATE_ZERO_ARM);
                 }
                 break;
 
-            case STATE_LINEUP_MINERALS:
-                speed = .7 * SPEED_MULTIPLIER;
-                if (lander == StartPosition.Depot)
-                    distance = 1400;
-                else
-                    distance = 1400;
-                distance = (int) (distance * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, 0)){
-                    Lift.runToBottom();
-                    NewMecanumDrive.stop();
-                    newState(STATE_HIT_MINERALS);
-                }
-
-                break;
-
-            case STATE_HIT_MINERALS:
-                speed = .4 * SPEED_MULTIPLIER;
-                switch (cubePosition) {
-                    case UNKNOWN_CUBE:
-                    case LEFT_CUBE:
-                        if (lander == StartPosition.Depot)
-                            distance = LEFT_CUBE_DISTANCE;
-                        else
-                            distance = LEFT_CUBE_CRATER_DISTANCE;
-                        distance = (int) (distance * DISTANCE_MULTIPLIER);
-                        depotAngle = LEFT_CUBE_ANGLE;
-                        if (NewMecanumDrive.forward(speed, distance, 0)){
-                            NewMecanumDrive.stop();
-                            newState(STATE_DIFFERENTIATE_PATHS);
-                        }
-                        break;
-
-                    case CENTER_CUBE:
-                        if (lander == StartPosition.Depot)
-                            distance = CENTER_CUBE_DISTANCE;
-                        else
-                            distance = CENTER_CUBE_CRATER_DISTANCE;
-                        distance = (int) (distance * DISTANCE_MULTIPLIER);
-                        depotAngle = CENTER_CUBE_ANGLE;
-                        if (NewMecanumDrive.forward(speed, distance, 0)){
-                            NewMecanumDrive.stop();
-                            newState(STATE_DIFFERENTIATE_PATHS);
-                        }
-                        break;
-
-                    case RIGHT_CUBE:
-                        if (lander == StartPosition.Depot)
-                            distance = RIGHT_CUBE_DISTANCE;
-                        else
-                            distance = RIGHT_CUBE_CRATER_DISTANCE;
-                        distance = (int) (distance * DISTANCE_MULTIPLIER);
-                        depotAngle = RIGHT_CUBE_ANGLE;
-                        if (NewMecanumDrive.backward(speed, distance, 0)){
-                            NewMecanumDrive.stop();
-                            newState(STATE_DIFFERENTIATE_PATHS);
-                        }
+            case STATE_ZERO_ARM:
+                if (Arm.zeroY()){
+                    Arm.stop();
+                    newState(STATE_DIFFERENTIATE_PATHS);
                 }
                 break;
 

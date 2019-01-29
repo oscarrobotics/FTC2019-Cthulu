@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3974d5a2-38fe-4710-9488-ba1c1fe1ba81" name="Default" comment="1/15 improved differentiation of Auto differences between Depot and Crater">
+    <list default="true" id="3974d5a2-38fe-4710-9488-ba1c1fe1ba81" name="Default" comment="1/21 fixed jerky arm movement for the most part and added increased tolerance to teleop arm movement state machines for faster operations">
+      <change afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestAutonomous.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestVuForia.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Gyro.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Gyro.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/NewMecanumDrive.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/NewMecanumDrive.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java" afterDir="false" />
     </list>
     <ignored path="build/" />
     <ignored path=".idea/" />
@@ -18,28 +21,23 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java">
+        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/NewMecanumDrive.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="620">
-              <caret line="39" column="50" selection-start-line="39" selection-start-column="50" selection-end-line="39" selection-end-column="50" />
+            <state relative-caret-position="344">
+              <caret line="231" column="97" selection-start-line="231" selection-start-column="97" selection-end-line="231" selection-end-column="97" />
+              <folding>
+                <element signature="e#7935#7936#0" expanded="true" />
+                <element signature="e#7974#7975#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/NewMecanumDrive.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="157" column="34" lean-forward="true" selection-start-line="157" selection-start-column="34" selection-end-line="157" selection-end-column="34" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="52" column="60" selection-start-line="52" selection-start-column="60" selection-end-line="52" selection-end-column="60" />
+            <state relative-caret-position="245">
+              <caret line="366" column="26" selection-start-line="366" selection-start-column="26" selection-end-line="366" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#4012#4013#0" expanded="true" />
@@ -50,24 +48,24 @@
                 <element signature="e#4271#4272#0" expanded="true" />
                 <element signature="e#4312#4313#0" expanded="true" />
                 <element signature="e#4371#4372#0" expanded="true" />
-                <element signature="e#13917#13918#0" expanded="true" />
-                <element signature="e#13980#13981#0" expanded="true" />
-                <element signature="e#14033#14034#0" expanded="true" />
-                <element signature="e#14099#14100#0" expanded="true" />
-                <element signature="e#14150#14151#0" expanded="true" />
-                <element signature="e#14196#14197#0" expanded="true" />
-                <element signature="e#14250#14251#0" expanded="true" />
-                <element signature="e#14320#14321#0" expanded="true" />
+                <element signature="e#13087#13088#0" expanded="true" />
+                <element signature="e#13150#13151#0" expanded="true" />
+                <element signature="e#13203#13204#0" expanded="true" />
+                <element signature="e#13269#13270#0" expanded="true" />
+                <element signature="e#13320#13321#0" expanded="true" />
+                <element signature="e#13366#13367#0" expanded="true" />
+                <element signature="e#13420#13421#0" expanded="true" />
+                <element signature="e#13490#13491#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Gyro.java">
+        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestAutonomous.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="640">
-              <caret line="32" column="38" selection-start-line="31" selection-start-column="48" selection-end-line="32" selection-end-column="38" />
+            <state relative-caret-position="2720">
+              <caret line="143" column="26" lean-forward="true" selection-start-line="141" selection-start-column="4" selection-end-line="143" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -75,25 +73,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestVuForia.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="134" column="21" selection-start-line="134" selection-start-column="21" selection-end-line="134" selection-end-column="21" />
+            <state relative-caret-position="435">
+              <caret line="88" lean-forward="true" selection-start-line="88" selection-end-line="88" />
               <folding>
                 <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Lift.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="520">
-              <caret line="65" column="45" selection-start-line="65" selection-start-column="45" selection-end-line="65" selection-end-column="45" />
-              <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#4400#4401#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -110,10 +97,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>TURN</find>
-      <find>pixy</find>
-      <find>targe</find>
-      <find>targ</find>
       <find>targetD</find>
       <find>dis</find>
       <find>cubePo</find>
@@ -134,12 +117,16 @@
       <find>_intakeCollect</find>
       <find>float</find>
       <find>isFi</find>
-      <find>teleop</find>
       <find>canW</find>
       <find>armSafety</find>
       <find>target</find>
       <find>1000</find>
       <find>XR</find>
+      <find>getY</find>
+      <find>Autonomous</find>
+      <find>_limit</find>
+      <find>teleop</find>
+      <find>limit</find>
     </findStrings>
     <replaceStrings>
       <replace>i2cData</replace>
@@ -187,15 +174,17 @@
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/OscarBaseOp.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Vector2d.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Util.java" />
-        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/BaseOp.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Pixy.java" />
-        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Gyro.java" />
-        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/AutoStates.java" />
+        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java" />
+        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/NewMecanumDrive.java" />
         <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java" />
+        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Gyro.java" />
+        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestAutonomous.java" />
+        <option value="$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestVuForia.java" />
       </list>
     </option>
   </component>
@@ -219,34 +208,11 @@
             <path>
               <item name="FTC2019-Cthulu" type="b2602c69:ProjectViewProjectNode" />
               <item name="FTC2019-Cthulu" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="libs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="FTC2019-Cthulu" type="b2602c69:ProjectViewProjectNode" />
-              <item name="FTC2019-Cthulu" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="teamcode" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="FTC2019-Cthulu" type="b2602c69:ProjectViewProjectNode" />
-              <item name="FTC2019-Cthulu" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="teamcode" type="462c0819:PsiDirectoryNode" />
-              <item name="Base" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="FTC2019-Cthulu" type="b2602c69:ProjectViewProjectNode" />
-              <item name="FTC2019-Cthulu" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="teamcode" type="462c0819:PsiDirectoryNode" />
-              <item name="Mechanisms" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="FTC2019-Cthulu" type="b2602c69:ProjectViewProjectNode" />
-              <item name="FTC2019-Cthulu" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="teamcode" type="462c0819:PsiDirectoryNode" />
-              <item name="OpModes" type="462c0819:PsiDirectoryNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
@@ -269,6 +235,11 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.firstinspires.ftc.teamcode.OpModes" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -460,13 +431,20 @@
       <option name="project" value="LOCAL" />
       <updated>1547600644296</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="1/21 fixed jerky arm movement for the most part and added increased tolerance to teleop arm movement state machines for faster operations">
+      <created>1548048001111</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1548048001111</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.06876332" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1924307" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -481,8 +459,8 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="FRC" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.4968017" visible="true" weight="0.25785482" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50319827" side_tool="true" weight="0.25785482" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49520257" visible="true" weight="0.2979415" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50479746" side_tool="true" weight="0.12026002" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32608697" />
       <window_info anchor="bottom" id="Messages" order="11" weight="0.32826087" />
       <window_info anchor="bottom" id="Tail" order="12" />
@@ -496,37 +474,6 @@
       <window_info anchor="right" id="Theme Preview" order="7" />
       <window_info anchor="right" id="Maven" order="8" />
     </layout>
-    <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18070363" />
-      <window_info id="Structure" order="1" weight="0.25" />
-      <window_info id="Designer" order="2" />
-      <window_info id="UI Designer" order="3" />
-      <window_info id="Favorites" order="4" side_tool="true" />
-      <window_info id="Image Layers" order="5" />
-      <window_info id="Capture Tool" order="6" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4978678" weight="0.42361864" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32934782" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="FRC" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.4968017" visible="true" weight="0.25785482" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50319827" side_tool="true" visible="true" weight="0.25785482" />
-      <window_info anchor="bottom" id="Version Control" order="10" weight="0.32608697" />
-      <window_info anchor="bottom" id="Messages" order="11" weight="0.32826087" />
-      <window_info anchor="bottom" id="Tail" order="12" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Palette&#9;" order="4" />
-      <window_info anchor="right" id="Maven Projects" order="5" />
-      <window_info anchor="right" id="Capture Analysis" order="6" />
-      <window_info anchor="right" id="Theme Preview" order="7" />
-      <window_info anchor="right" id="Maven" order="8" />
-    </layout-to-restore>
   </component>
   <component name="Vcs.Log.History.Properties">
     <option name="COLUMN_ORDER">
@@ -552,7 +499,8 @@
     <MESSAGE value="1/10 commit" />
     <MESSAGE value="1/12 Added crater side Auto" />
     <MESSAGE value="1/15 improved differentiation of Auto differences between Depot and Crater" />
-    <option name="LAST_COMMIT_MESSAGE" value="1/15 improved differentiation of Auto differences between Depot and Crater" />
+    <MESSAGE value="1/21 fixed jerky arm movement for the most part and added increased tolerance to teleop arm movement state machines for faster operations" />
+    <option name="LAST_COMMIT_MESSAGE" value="1/21 fixed jerky arm movement for the most part and added increased tolerance to teleop arm movement state machines for faster operations" />
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
@@ -751,16 +699,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="597">
-          <caret line="51" selection-start-line="51" selection-end-line="51" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/BaseOp.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="597">
@@ -778,16 +716,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="134" column="21" selection-start-line="134" selection-start-column="21" selection-end-line="134" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/AutoStates.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="700">
@@ -798,34 +726,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java">
+    <entry file="jar://$PROJECT_DIR$/libs/RobotCore-release-sources.jar!/com/qualcomm/robotcore/hardware/DigitalChannel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="620">
-          <caret line="39" column="50" selection-start-line="39" selection-start-column="50" selection-end-line="39" selection-end-column="50" />
+        <state relative-caret-position="347">
+          <caret line="88" lean-forward="true" selection-start-line="88" selection-end-line="88" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Gyro.java">
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Hardware.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="32" column="38" selection-start-line="31" selection-start-column="48" selection-end-line="32" selection-end-column="38" />
+        <state relative-caret-position="444">
+          <caret line="52" column="11" lean-forward="true" selection-start-line="52" selection-start-column="11" selection-end-line="52" selection-end-column="11" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/NewMecanumDrive.java">
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/Autonomous2019.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="157" column="34" lean-forward="true" selection-start-line="157" selection-start-column="34" selection-end-line="157" selection-end-column="34" />
+        <state relative-caret-position="-1225">
+          <caret line="468" column="27" selection-start-line="468" selection-start-column="27" selection-end-line="468" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Mechanisms/Arm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="52" column="60" selection-start-line="52" selection-start-column="60" selection-end-line="52" selection-end-column="60" />
+        <state relative-caret-position="245">
+          <caret line="366" column="26" selection-start-line="366" selection-start-column="26" selection-end-line="366" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#4012#4013#0" expanded="true" />
@@ -836,14 +767,63 @@
             <element signature="e#4271#4272#0" expanded="true" />
             <element signature="e#4312#4313#0" expanded="true" />
             <element signature="e#4371#4372#0" expanded="true" />
-            <element signature="e#13917#13918#0" expanded="true" />
-            <element signature="e#13980#13981#0" expanded="true" />
-            <element signature="e#14033#14034#0" expanded="true" />
-            <element signature="e#14099#14100#0" expanded="true" />
-            <element signature="e#14150#14151#0" expanded="true" />
-            <element signature="e#14196#14197#0" expanded="true" />
-            <element signature="e#14250#14251#0" expanded="true" />
-            <element signature="e#14320#14321#0" expanded="true" />
+            <element signature="e#13087#13088#0" expanded="true" />
+            <element signature="e#13150#13151#0" expanded="true" />
+            <element signature="e#13203#13204#0" expanded="true" />
+            <element signature="e#13269#13270#0" expanded="true" />
+            <element signature="e#13320#13321#0" expanded="true" />
+            <element signature="e#13366#13367#0" expanded="true" />
+            <element signature="e#13420#13421#0" expanded="true" />
+            <element signature="e#13490#13491#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/Gyro.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="574">
+          <caret line="91" column="38" selection-start-line="91" selection-start-column="38" selection-end-line="91" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TeleOp2019.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="560">
+          <caret line="39" column="14" lean-forward="true" selection-start-line="39" selection-start-column="14" selection-end-line="39" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/Base/NewMecanumDrive.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="344">
+          <caret line="231" column="97" selection-start-line="231" selection-start-column="97" selection-end-line="231" selection-end-column="97" />
+          <folding>
+            <element signature="e#7935#7936#0" expanded="true" />
+            <element signature="e#7974#7975#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestAutonomous.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2720">
+          <caret line="143" column="26" lean-forward="true" selection-start-line="141" selection-start-column="4" selection-end-line="143" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/firstinspires/ftc/teamcode/OpModes/TestVuForia.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="88" lean-forward="true" selection-start-line="88" selection-end-line="88" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#4400#4401#0" expanded="true" />
           </folding>
         </state>
       </provider>

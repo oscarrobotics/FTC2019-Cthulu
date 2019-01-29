@@ -14,7 +14,7 @@ public class Gyro extends OscarCommon {
     public static double CurrentGyroHeading = 0.0;
     public static double LastGyroHeading = 0.0;
 
-    public static final double kP = 0.025;
+    public static final double kP = 0.03;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kEpsilon = 1;
@@ -89,7 +89,7 @@ public class Gyro extends OscarCommon {
         double target = TargetHeading;
         double posError = gyro - target;
         double epsilon = 5;//3
-        double minSpeed = isTurning?.4:.3;
+        double minSpeed = isTurning?.5:.3;
         double maxSpeed = 0.5;//1
 
 
