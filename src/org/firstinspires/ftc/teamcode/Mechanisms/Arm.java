@@ -13,13 +13,10 @@ public class Arm extends OscarCommon {
     private static Servo _dumpServo;
     private static DigitalChannel _limitSwitch;
 
-    private static int armXTargetPos, armYTargetPos;
-
     private static boolean lastLimitState, hasYZeroed;
     private static boolean yInDeadzone, lastYOutDeadzone, xInDeadzone;
-    private static boolean yWasInDeadzone, xWasInDeadzone;
-    public static boolean inStateMachine;
-    public static boolean isDone = false;
+    private static boolean xWasInDeadzone = false;
+    public static boolean inStateMachine, limitOverride = false;
 
     public static int holdPosition;
 
@@ -37,8 +34,8 @@ public class Arm extends OscarCommon {
 
     // extend/retract values
     private static final int ARM_X_MAX = -3400;
-    private static final int ARM_X_MIN = -50;
-    private static final int ARM_X_SCORE = -3200;
+    private static final int ARM_X_MIN = 0;
+    private static final int ARM_X_SCORE = -2750;
     private static final int ARM_X_CRATER = -2600;
     private static final int ARM_X_MOVE_TOLERANCE = 25;
     private static final int ARM_X_MOVE_STATE_TOLERANCE = 750;
@@ -47,8 +44,8 @@ public class Arm extends OscarCommon {
 
     // raise/lower values
     private static final int ARM_Y_CRATER = -400;
-    private static final int ARM_Y_SCORE = -2450;
-    private static final int ARM_Y_MAX = -2550;
+    private static final int ARM_Y_SCORE = -2350;
+    private static final int ARM_Y_MAX = -2500;
     private static final int ARM_Y_MIN = 200;
     private static final int ARM_Y_MOVE_TOLERANCE = 25;
     private static final int ARM_Y_MOVE_STATE_TOLERANCE = 750;
@@ -80,7 +77,7 @@ public class Arm extends OscarCommon {
         _intakeArmExtend = Hardware.MechanismMotors.intakeArmExtend;
         _intakeArmVertical = Hardware.MechanismMotors.intakeArmVertical;
 
-        _intakeCollect.setDirection(DcMotorSimple.Direction.FORWARD);
+        _intakeCollect.setDirection(DcMotorSimple.Direction.REVERSE);
         _intakeArmExtend.setDirection(DcMotorSimple.Direction.FORWARD);
         _intakeArmVertical.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -135,9 +132,9 @@ public class Arm extends OscarCommon {
                holdPosition = getYPos() - ARM_UP_TOLERANCE;
                _telemetry.addData("Trying to move up", stickVal);
            } else {
-               if (hasYZeroed) {
+               if (hasYZeroed && _limitSwitch.getState()) {
                    moveArmY(ARM_Y_MIN, stickVal);
-                   holdPosition = getYPos() + ARM_DOWN_TOLERANCE;
+                   holdPosition = getYPos() + (!_limitSwitch.getState() ? 0 : ARM_DOWN_TOLERANCE);
                    _telemetry.addData("Trying to move down", stickVal);
                } else {
                    moveArmY(10000, stickVal);
@@ -173,14 +170,19 @@ public class Arm extends OscarCommon {
     }
 
     public static boolean moveArmY(int setpoint, double power) {
-        armYTargetPos = setpoint;
-        if (hasYZeroed) {
-            if (setpoint < ARM_Y_MAX) { setpoint = ARM_Y_MAX; }
-            if (setpoint > ARM_Y_MIN) { setpoint = ARM_Y_MIN; }
+        if (!limitOverride) {
+            if (hasYZeroed) {
+                if (setpoint < ARM_Y_MAX) {
+                    setpoint = ARM_Y_MAX;
+                }
+                if (setpoint != ARM_Y_MIN && setpoint > 0) {
+                    setpoint = 0;
+                }
+            }
+            if (!_limitSwitch.getState() && setpoint > 0) {
+                setpoint = 0;
+            }
         }
-
-        _telemetry.addLine("Arm Y Safety: " + armSafety(power, getYPos()));
-
         _intakeArmVertical.setTargetPosition(setpoint);
         _intakeArmVertical.setPower(power);
         int error = Math.abs(Math.abs(_intakeArmVertical.getCurrentPosition()) - Math.abs(setpoint));
@@ -188,9 +190,11 @@ public class Arm extends OscarCommon {
     }
 
     public static boolean moveArmX(int setpoint, double power) {
-        armXTargetPos = setpoint;
-        if (setpoint < ARM_X_MAX) { setpoint = ARM_X_MAX; }
-        if (setpoint > ARM_X_MIN) { setpoint = ARM_X_MIN; }
+        //if (!limitOverride){
+            if (setpoint < ARM_X_MAX) { setpoint = ARM_X_MAX; }
+            if (setpoint > ARM_X_MIN) { setpoint = ARM_X_MIN; }
+       // }
+
         _intakeArmExtend.setTargetPosition(setpoint);
         _intakeArmExtend.setPower(power);
         int error = Math.abs(Math.abs(_intakeArmExtend.getCurrentPosition()) - Math.abs(setpoint));
@@ -233,7 +237,7 @@ public class Arm extends OscarCommon {
         _telemetry.addLine("Arm Horizontal Actual: " + _intakeArmExtend.getCurrentPosition());
     }
 
-    public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
+    public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad, Gamepad driver) {
         double ArmXStick = gamepad.right_stick_y * (gamepad.right_stick_button ? (ARM_X_MULTIPLIER * ARM_X_MULTIPLIER_BOOOoST) : ARM_X_MULTIPLIER);
         double ArmYStick = gamepad.left_stick_y;
 
@@ -251,6 +255,11 @@ public class Arm extends OscarCommon {
         if (!inStateMachine) {
             powerMoveArmX(ArmXStick);
             powerMoveArmY(ArmYStick);
+            /*if (driver.b)
+                limitOverride = true;
+            else
+                limitOverride = false;
+                */
         }
 
          if (hasYZeroed) {
@@ -267,7 +276,7 @@ public class Arm extends OscarCommon {
          if (gamepad.right_trigger > 0.1){
              succ(gamepad.right_trigger * 0.9);
          } else if (gamepad.left_trigger > 0.1){
-             unSucc(gamepad.left_trigger * 0.75);
+             unSucc(gamepad.left_trigger * 0.9);
          } else {
              _intakeCollect.setPower(0.0);
          }
@@ -331,7 +340,7 @@ public class Arm extends OscarCommon {
                 }
                 break;
             case X_CRATER:
-                if(moveArmX(ARM_X_CRATER, .5) || mBmgStateTime.milliseconds() > 1000) {
+                if(YMinHeight() || mBmgStateTime.milliseconds() > 1000) {
                     newBmgState(BigMoveGroundState.IDLE);
                 }
                 break;
@@ -340,12 +349,10 @@ public class Arm extends OscarCommon {
         }
     }
 
-    public static void succ(double succPower) {
-        _intakeCollect.setPower(Math.pow(succPower, 2));
-    }
+    public static void succ(double succPower) { _intakeCollect.setPower(Math.pow(succPower, 3)); }
 
     public static void unSucc(double unSuccPower) {
-        _intakeCollect.setPower(-Math.pow(unSuccPower, 2));
+        _intakeCollect.setPower(-Math.pow(unSuccPower, 3));
     }
 
     public static void autoIntake(double power) {
@@ -356,11 +363,11 @@ public class Arm extends OscarCommon {
         _dumpServo.setPosition(state ? DUMP_OPEN : DUMP_CLOSE);
     }
 
-    private static boolean YScoreHeight() { return moveArmY(ARM_Y_SCORE, 1); }
+    private static boolean YScoreHeight() { return moveArmY(ARM_Y_SCORE, 0.75); }
 
     private static boolean YMinHeight() { return moveArmY(ARM_Y_CRATER, 0.5); }
 
-    private static boolean XExtend() { return moveArmX(ARM_X_SCORE, 1); }
+    private static boolean XExtend() { return moveArmX(ARM_X_SCORE, 0.5); }
 
     private static boolean XRetract() { return moveArmX(-1600, 0.5); }
 
@@ -377,7 +384,7 @@ public class Arm extends OscarCommon {
     }
 
     public static boolean autoScoreGold(){
-        if (moveArmY(ARM_Y_SCORE,0.5) && moveArmX(ARM_X_SCORE, 0.5)){
+        if (moveArmY(-2500,0.75) && moveArmX(-3100, 0.75)){
             return true;
         } else return false;
     }
@@ -392,7 +399,7 @@ public class Arm extends OscarCommon {
     }
 
     public static  boolean return2(){
-        if (Arm.moveArmY(-600, 0.5)) {
+        if (Arm.moveArmY(-800, 0.5)) {
             if (Arm.moveArmX(0, 0.5)) {
                 return true;
             }

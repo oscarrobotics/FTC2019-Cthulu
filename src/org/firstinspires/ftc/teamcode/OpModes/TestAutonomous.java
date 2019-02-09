@@ -57,16 +57,22 @@ public class TestAutonomous extends OscarBaseOp {
     private void newState(State newState){
         // Reset the state time, and then change to next state.
         mStateTime.reset();
+        NewMecanumDrive.stop();
+        Move.reset();
         mCurrentMainState = newState;
     }
 
     private void newDepotState(DepotState newState) {
         mDepotStateTime.reset();
+        NewMecanumDrive.stop();
+        Move.reset();
         mCurrentDepotState = newState;
     }
 
     private void newCraterState(CraterState newState) {
         mCraterStateTime.reset();
+        NewMecanumDrive.stop();
+        Move.reset();
         mCurrentCraterState = newState;
     }
 
@@ -78,7 +84,6 @@ public class TestAutonomous extends OscarBaseOp {
         STATE_STRAFE_RIGHT,
         STATE_TURN_TO_MINERALS,
         STATE_ZERO_ARM,
-        STATE_TURN_TO_GOLD,
         STATE_DIFFERENTIATE_PATHS,
         STATE_STOP
     }
@@ -86,6 +91,7 @@ public class TestAutonomous extends OscarBaseOp {
     public enum DepotState {
         DS_INITIAL,
         DS_PREPARE_ARM,
+        DS_PREPARE_EJECT,
         DS_EJECT_MARKER,
         DS_RETURN_ARM,
         DS_CENTER_MINERALS,
@@ -94,12 +100,15 @@ public class TestAutonomous extends OscarBaseOp {
         DS_INTAKE_GOLD,
         DS_BACK,
         DS_LINEUP_SCORE,
-        DS_TURN_SCORE,
         DS_SCORE_ARM,
         DS_MOVE_SCORE,
+        DS_SCORE,
         DS_PREPARE_MOVEMENT,
         DS_TURN_TO_CRATER,
         DS_DRIVE_TO_CRATER,
+        DS_TURN_TO_CRATER2,
+        DS_FLUSH_WALL,
+        DS_ALLIGN_VUFORIA,
         DS_APPROACH_CRATER,
         DS_STOP
     }
@@ -188,14 +197,13 @@ public class TestAutonomous extends OscarBaseOp {
     private void Crater() {
         switch (mCurrentCraterState) {
             case CS_INITIAL:
-                NewMecanumDrive.stop();
                 newCraterState(CS_HIT_CUBE);
                 break;
+
             case CS_HIT_CUBE:
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = (int) (800 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, 0)) {
-                    NewMecanumDrive.stop();
+                if (Move.right(speed, distance, 0)) {
                     newCraterState(CS_UN_HIT_CUBE);
                 }
                 break;
@@ -203,8 +211,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_UN_HIT_CUBE:
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = (int) (1000 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.left(speed, distance, 0)) {
-                    NewMecanumDrive.stop();
+                if (Move.left(speed, distance, 0)) {
                     newCraterState(CS_LINEUP_DEPOT);
                 }
                 break;
@@ -226,7 +233,7 @@ public class TestAutonomous extends OscarBaseOp {
                         break;
                 }
                 distance = (int) (distance * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.forward(speed, distance, 0) || mCraterStateTime.milliseconds() >= 6000) {
+                if (Move.forward(speed, distance, 0) || mCraterStateTime.milliseconds() >= 6000) {
                     newCraterState(CS_TURN_TO_DEPOT);
                 }
                 break;
@@ -234,7 +241,6 @@ public class TestAutonomous extends OscarBaseOp {
 
             case CS_TURN_TO_DEPOT:
                 if (NewMecanumDrive.turn(45)) {
-                    NewMecanumDrive.stop();
                     newCraterState(CS_FLUSH_TO_WALL1);
                 }
                 break;
@@ -242,8 +248,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_FLUSH_TO_WALL1:
                 speed = .85 * SPEED_MULTIPLIER;
                 distance = (int) (1200 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, 45)) {
-                    NewMecanumDrive.stop();
+                if (Move.right(speed, distance, 45)) {
                     newCraterState(CS_CLEAR_WALL1);
                 }
                 break;
@@ -251,8 +256,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_CLEAR_WALL1:
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = (int) (300 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.left(speed, distance, 45)) {
-                    NewMecanumDrive.stop();
+                if (Move.left(speed, distance, 45)) {
                     newCraterState(CS_DRIVE_TO_DEPOT1);
                 }
                 break;
@@ -260,7 +264,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_DRIVE_TO_DEPOT1:
                 speed = 0.5 * SPEED_MULTIPLIER;
                 distance = (int) (1900 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.forward(speed, distance, 45)) {
+                if (Move.forward(speed, distance, 45)) {
                     newCraterState(CS_FLUSH_TO_WALL2);
                 }
                 break;
@@ -268,8 +272,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_FLUSH_TO_WALL2:
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = (int) (600 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, 45)) {
-                    NewMecanumDrive.stop();
+                if (Move.right(speed, distance, 45)) {
                     newCraterState(CS_CLEAR_WALL2);
                 }
                 break;
@@ -277,8 +280,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_CLEAR_WALL2:
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = (int) (300 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.left(speed, distance, 45)) {
-                    NewMecanumDrive.stop();
+                if (Move.left(speed, distance, 45)) {
                     newCraterState(CS_DRIVE_TO_DEPOT2);
                 }
                 break;
@@ -301,8 +303,7 @@ public class TestAutonomous extends OscarBaseOp {
                 }
                 distance = (int) (distance * DISTANCE_MULTIPLIER);
 
-                if (NewMecanumDrive.forward(speed, distance, 45)) {
-                    NewMecanumDrive.stop();
+                if (Move.forward(speed, distance, 45)) {
                     newCraterState(CS_EJECT_MARKER);
                 }
                 break;
@@ -318,7 +319,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_RETURN_TO_CRATER:
                 speed = 0.5 * SPEED_MULTIPLIER;
                 distance = (int) (3000 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, 45)){
+                if (Move.backward(speed, distance, 45)){
                     newCraterState(CS_FLUSH_TO_WALL3);
                 }
                 break;
@@ -326,8 +327,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_FLUSH_TO_WALL3:
                 speed = .75 * SPEED_MULTIPLIER;
                 distance = (int) (800 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, 45)) {
-                    NewMecanumDrive.stop();
+                if (Move.right(speed, distance, 45)) {
                     newCraterState(CS_APPROACH_CRATER);
                 }
                 break;
@@ -335,7 +335,7 @@ public class TestAutonomous extends OscarBaseOp {
             case CS_APPROACH_CRATER:
                 speed = 0.25 * SPEED_MULTIPLIER;
                 distance = (int) (2400 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, 40)){//45
+                if (Move.backward(speed, distance, 40)){//45
                     newCraterState(CS_STOP);
                 }
                 break;
@@ -348,42 +348,48 @@ public class TestAutonomous extends OscarBaseOp {
     private void Depot() {
         switch (mCurrentDepotState) {
             case DS_INITIAL:
-                NewMecanumDrive.stop();
                 newDepotState(DS_PREPARE_ARM);
                 break;
 
             case DS_PREPARE_ARM:
-                if (Arm.moveArmY(-500, 0.5)) {
-                    if (Arm.moveArmX(-3000, 0.5) && mDepotStateTime.milliseconds() > 2000) {
-                        Arm.stop();
-                        newDepotState(DS_EJECT_MARKER);
+                if (Arm.moveArmY(-600, 0.5)) {
+                    if (Arm.moveArmX(-3400, 0.5) && mDepotStateTime.milliseconds() > 1000) {
+                        newDepotState(DS_PREPARE_EJECT);
                     }
+                }
+                break;
+
+            case DS_PREPARE_EJECT:
+                speed = .5 * SPEED_MULTIPLIER;
+                distance = (int) (250 * DISTANCE_MULTIPLIER);
+                if (Move.forward(speed, distance, -90)){
+                    newDepotState(DS_EJECT_MARKER);
                 }
                 break;
 
             case DS_EJECT_MARKER:
                 Arm.autoIntake(-1);
-                if (mDepotStateTime.milliseconds() >= 2000) {
+                if (mDepotStateTime.milliseconds() >= 1250) {
                     Arm.autoIntake(0);
                     newDepotState(DS_RETURN_ARM);
                 }
                 break;
 
             case DS_RETURN_ARM:
+                speed = .5 * SPEED_MULTIPLIER;
+                distance = (int) (450 * DISTANCE_MULTIPLIER);
                 if (Arm.moveArmX(-1200, 0.5)) {
-                    if (NewMecanumDrive.backward(0.5, 400, -90)) {
+                    if (Move.backward(speed, distance, -90)) {
                         Arm.stop();
-                        NewMecanumDrive.stop();
                         newDepotState(DS_CENTER_MINERALS);
                     }
                 }
                 break;
 
             case DS_CENTER_MINERALS:
-                speed = .5 * SPEED_MULTIPLIER;
-                distance = (int) (100 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.left(speed, distance, -90)){
-                    NewMecanumDrive.stop();
+                speed = .7 * SPEED_MULTIPLIER;
+                distance = (int) (500 * DISTANCE_MULTIPLIER);
+                if (Move.left(speed, distance, -90)){
                     newDepotState(DS_TURN_TO_GOLD);
                 }
                 break;
@@ -401,14 +407,13 @@ public class TestAutonomous extends OscarBaseOp {
                         goldAngle = RIGHT_CUBE_ANGLE;
                         break;
                 }
-                if (NewMecanumDrive.turn(-goldAngle)){
-                    NewMecanumDrive.stop();
+                if (NewMecanumDrive.turn(-goldAngle) || mDepotStateTime.milliseconds() > 750){
                     newDepotState(DS_PREPARE_INTAKE);
                 }
                 break;
 
             case DS_PREPARE_INTAKE:
-                if (Arm.zeroY()) {
+                if (Arm.moveArmY(1, 0.75) || mDepotStateTime.milliseconds() > 1500) {
                     Arm.stop();
                     newDepotState(DS_INTAKE_GOLD);
                 }
@@ -418,33 +423,31 @@ public class TestAutonomous extends OscarBaseOp {
                 Arm.autoIntake(1);
                 speed = .2 * SPEED_MULTIPLIER;
                 distance = (int) (200 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.forward(speed, distance, -goldAngle) && mDepotStateTime.milliseconds() > 2000){
-                    NewMecanumDrive.stop();
+                if (Move.forward(speed, distance, -goldAngle) && mDepotStateTime.milliseconds() > 1750){
+                    Arm.autoIntake(0);
                     newDepotState(DS_BACK);
                 }
                 break;
 
             case DS_BACK:
-                if (NewMecanumDrive.backward(0.25, 200, -goldAngle)){
-                    NewMecanumDrive.stop();
+                speed = .3 * SPEED_MULTIPLIER;
+                distance = (int) (75 * DISTANCE_MULTIPLIER);
+                Arm.autoIntake(-1);
+                if (Move.backward(speed, distance, -goldAngle)){
                     newDepotState(DS_LINEUP_SCORE);
                 }
+                break;
 
             case DS_LINEUP_SCORE:
-                speed = .5 * SPEED_MULTIPLIER;
-                distance = (int) (200 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, -90)){
-                    if (Arm.moveArmX(-1600, 0.5)){
-                        Arm.autoIntake(0);
-                        NewMecanumDrive.stop();
-                        Arm.stop();
-                        newDepotState(DS_SCORE_ARM);
-                    }
+                Arm.autoIntake(0);
+                if (Arm.moveArmX(-1600, 0.5)){
+                    Arm.stop();
+                    newDepotState(DS_SCORE_ARM);
                 }
                 break;
 
             case DS_SCORE_ARM:
-                if (Arm.autoScoreGold() || mDepotStateTime.milliseconds() >= 3000){
+                if (Arm.autoScoreGold() || mDepotStateTime.milliseconds() > 1500){
                     Arm.stop();
                     newDepotState(DS_MOVE_SCORE);
                 }
@@ -452,20 +455,35 @@ public class TestAutonomous extends OscarBaseOp {
 
             case DS_MOVE_SCORE:
                 speed = .2 * SPEED_MULTIPLIER;
-                distance = (int) (600 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.backward(speed, distance, -90) || mDepotStateTime.milliseconds() >= 2000){
+                distance = (int) (400 * DISTANCE_MULTIPLIER);
+                if (Move.backward(speed, distance, -90) || mDepotStateTime.milliseconds() >= 2000){
                     Arm.autoIntake(1);
-                    NewMecanumDrive.stop();
-                    newDepotState(DS_PREPARE_MOVEMENT);
+                    newDepotState(DS_SCORE);
                 }
                 break;
+
+            case DS_SCORE:
+                if (mDepotStateTime.milliseconds() < 1250)
+                    Arm.autoIntake(1);
+                else {
+                    Arm.autoIntake(0);
+                    newDepotState(DS_PREPARE_MOVEMENT);
+                }
 
             case DS_PREPARE_MOVEMENT:
                 if (Arm.return1() || mDepotStateTime.milliseconds() >= 3000){
                     Arm.stop();
-                    if (NewMecanumDrive.forward(0.3, 400, 0)) {
-                        NewMecanumDrive.stop();
+                    if (NewMecanumDrive.turn(0)) {
                         Arm.autoIntake(0);
+                        Arm.stop();
+                        newDepotState(DS_TURN_TO_CRATER);
+                    }
+                }
+                break;
+
+            case DS_TURN_TO_CRATER:
+                if (NewMecanumDrive.turn(0)) {
+                    if (Arm.return2()){
                         Arm.stop();
                         newDepotState(DS_DRIVE_TO_CRATER);
                     }
@@ -474,22 +492,38 @@ public class TestAutonomous extends OscarBaseOp {
 
             case DS_DRIVE_TO_CRATER:
                 speed = .5 * SPEED_MULTIPLIER;
-                distance = (int) (200 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.forward(speed, distance, 45)) {
-                    if (Arm.return2()){
-                        NewMecanumDrive.stop();
-                        Arm.stop();
-                        newDepotState(DS_STOP);
-                    }
+                distance = (int) (1400 * DISTANCE_MULTIPLIER);
+                if (Move.forward(speed, distance, 0)) {
+                        newDepotState(DS_TURN_TO_CRATER2);
+                }
+                break;
 
+            case DS_TURN_TO_CRATER2:
+                if (NewMecanumDrive.turn(45)){
+                    newDepotState(DS_FLUSH_WALL);
+                }
+                break;
+
+            case DS_ALLIGN_VUFORIA:
+                    TestVuforia vuforia = new TestVuforia();
+                    vuforia.initVuforia();
+                    if (TestVuforia.goToTarget(TestVuforia.getErrorX(true), TestVuforia.getErrorY(), TestVuforia.getErrorRotate())  && mDepotStateTime.milliseconds() > 3000){
+                        newDepotState(DS_APPROACH_CRATER);
+                    }
+                break;
+
+            case DS_FLUSH_WALL:
+                speed = .75 * SPEED_MULTIPLIER;
+                distance = (int) (1500 * DISTANCE_MULTIPLIER);
+                if (Move.right(speed, distance, 45)){
+                    newDepotState(DS_APPROACH_CRATER);
                 }
                 break;
 
             case DS_APPROACH_CRATER:
-                speed = .25 * SPEED_MULTIPLIER;
-                distance = (int) (2000 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.forward(speed, distance, 45)) {
-                    NewMecanumDrive.stop();
+                speed = .2 * SPEED_MULTIPLIER;
+                distance = (int) (2500 * DISTANCE_MULTIPLIER);
+                if (Move.forward(speed, distance, 45)) {
                     newDepotState(DS_STOP);
                 }
                 break;
@@ -524,9 +558,7 @@ public class TestAutonomous extends OscarBaseOp {
             case STATE_DETACH_LANDER:
                 speed = .3 * SPEED_MULTIPLIER;
                 distance = (int) (300 * DISTANCE_MULTIPLIER);
-
-                if (NewMecanumDrive.backward(speed, distance, 0) || mStateTime.milliseconds() >= 2000){
-                    NewMecanumDrive.stop();
+                if (Move.backward(speed, distance, 0) || mStateTime.milliseconds() >= 2000){
                     newState(STATE_STRAFE_RIGHT);
                 }
                 break;
@@ -534,8 +566,7 @@ public class TestAutonomous extends OscarBaseOp {
             case STATE_STRAFE_RIGHT:
                 speed = .6 * SPEED_MULTIPLIER;
                 distance = (int) (1200 * DISTANCE_MULTIPLIER);
-                if (NewMecanumDrive.right(speed, distance, 0)){
-                    NewMecanumDrive.stop();
+                if (Move.right(speed, distance, 0)){
                     newState(STATE_TURN_TO_MINERALS);
                 }
                 break;
@@ -543,13 +574,13 @@ public class TestAutonomous extends OscarBaseOp {
 
             case STATE_TURN_TO_MINERALS:
                 if (NewMecanumDrive.turn(-90)){
-                    NewMecanumDrive.stop();
                     newState(STATE_ZERO_ARM);
                 }
                 break;
 
             case STATE_ZERO_ARM:
                 if (Arm.zeroY()){
+                    Lift.runToBottom();
                     Arm.stop();
                     newState(STATE_DIFFERENTIATE_PATHS);
                 }

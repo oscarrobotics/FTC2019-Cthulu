@@ -106,7 +106,7 @@ public class Gyro extends OscarCommon {
         return rotation;
     }
 
-    protected static double getCompensation() {
+    public static double getCompensation() {
         return getCompensation(false);
     }
 

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import org.firstinspires.ftc.teamcode.Base.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Base.NewMecanumDrive;
 import org.firstinspires.ftc.teamcode.Mechanisms.Arm;
 import org.firstinspires.ftc.teamcode.Mechanisms.Lift;
@@ -37,7 +36,7 @@ public class TeleOp2019 extends OscarBaseOp {
 
         NewMecanumDrive.teleopControl(gamepad1, lastGamepad1);
         Lift.teleopControl(gamepad2);
-        Arm.teleopControl(gamepad2, lastGamepad2);
+        Arm.teleopControl(gamepad2, lastGamepad2, gamepad1);
 
         try {
             lastGamepad1.copy(gamepad1);

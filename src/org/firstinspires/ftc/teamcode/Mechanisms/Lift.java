@@ -25,8 +25,10 @@ public class Lift extends OscarCommon {
     }
 
     public static void setPosition(int position){
-        if (position < ELEVATOR_MIN) position = ELEVATOR_MIN;
-        if (position > ELEVATOR_MAX) position = ELEVATOR_MAX;
+        if (!Arm.limitOverride) {
+            if (position < ELEVATOR_MIN) position = ELEVATOR_MIN;
+            if (position > ELEVATOR_MAX) position = ELEVATOR_MAX;
+        }
         _elevator.setTargetPosition(position);
         _elevator.setPower(1.0);
     }
