@@ -83,19 +83,20 @@ public class Gyro extends OscarCommon {
         return rotateValue;
     }
 
-    protected static double getCompensation(boolean isTurning) {
+    public static double getCompensation() {
         double rotation = 0.0;
         double gyro = CurrentGyroHeading;
         double target = TargetHeading;
         double posError = gyro - target;
-        double epsilon = 5;//3
-        double minSpeed = isTurning?.5:.3;
-        double maxSpeed = 0.5;//1
+        double epsilon = 5;
+        double minSpeed = 0.2;
+        double maxSpeed = 0.5;
 
 
         if (Math.abs(posError) > 180) {
             posError = -360 * Math.signum(posError) + posError;
         }
+
         if (Math.abs(posError) > epsilon) {
             rotation = minSpeed + (Math.abs(posError) / 180) * (maxSpeed - minSpeed);
             rotation = rotation * Math.signum(posError);
@@ -104,10 +105,6 @@ public class Gyro extends OscarCommon {
         _telemetry.addData("Gyro Output", rotation);
 
         return rotation;
-    }
-
-    public static double getCompensation() {
-        return getCompensation(false);
     }
 
     public static void update() {

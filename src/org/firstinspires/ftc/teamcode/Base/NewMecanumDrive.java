@@ -16,10 +16,10 @@ public class NewMecanumDrive extends OscarCommon{
     private static int AutoTargetPos = 0;
     private static int AutoCurrentPos = 0;
     private static int AutoStartPos = 0;
-    private static final int AUTO_MOVE_TOLERANCE = 100;
+    private static final int AUTO_MOVE_TOLERANCE = 50;
 
     private static final double ROTATE_SPEED_MULTIPLIER = 1.2;
-    private static final double ROTATE_SPEED_EXTENDED_MULTIPLIER = 0.25;
+    private static final double ROTATE_SPEED_EXTENDED_MULTIPLIER = 0.3;
     private static final double DRIVE_SPEED_MULTIPLIER = .9;
 
     public static void init() {
@@ -104,19 +104,40 @@ public class NewMecanumDrive extends OscarCommon{
     }
 
     public static void teleopControl(Gamepad gamepad, Gamepad lastGamepad) {
-        boolean leftStickTranslationalDrive = true;
+        boolean rightStickTranslationalDrive = true;
+        boolean operatorTurning = false;
 
-        double rotateStick = (leftStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x);
-        double lastRotateStick = leftStickTranslationalDrive ? lastGamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
-        double rightStickX = leftStickTranslationalDrive ? gamepad.right_stick_x : gamepad.left_stick_x* DRIVE_SPEED_MULTIPLIER;
-        double rightStickY = leftStickTranslationalDrive ? -gamepad.right_stick_y : -gamepad.left_stick_y* DRIVE_SPEED_MULTIPLIER;
+        double rotateStick = (rightStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x);
+        double opRotateStick = (rightStickTranslationalDrive ? gamepad.left_stick_x : gamepad.right_stick_x);
+        double lastRotateStick = rightStickTranslationalDrive ? lastGamepad.left_stick_x : gamepad.right_stick_x * ROTATE_SPEED_MULTIPLIER;
+        double rightStickX = rightStickTranslationalDrive ? gamepad.right_stick_x : gamepad.left_stick_x* DRIVE_SPEED_MULTIPLIER;
+        double rightStickY = rightStickTranslationalDrive ? -gamepad.right_stick_y : -gamepad.left_stick_y* DRIVE_SPEED_MULTIPLIER;
 
-        if (toggleTurnSensitivity){
-            if (gamepad.a)
-                rotateStick *= 0.4;
+        if (!operatorTurning){
+            if (toggleTurnSensitivity){
+                if (gamepad.a)
+                    rotateStick *= 0.4;
+            } else {
+                rotateStick *= rampTurning(rotateStick);
+            }
         } else {
-            rotateStick *= rampTurning(rotateStick);
+            if (Math.abs(rotateStick) > 0.01){
+                if (toggleTurnSensitivity){
+                    if (gamepad.a)
+                        rotateStick *= 0.4;
+                } else {
+                    rotateStick *= rampTurning(rotateStick);
+                }
+            }
+            if (toggleTurnSensitivity){
+                if (gamepad.a)
+                    rotateStick *= 0.4;
+            } else {
+                rotateStick *= rampTurning(rotateStick);
+            }
+
         }
+
 
         if (gamepad.y && !lastGamepad.y) {
             isFieldOriented = !isFieldOriented;
@@ -138,6 +159,7 @@ public class NewMecanumDrive extends OscarCommon{
                 right(gamepad.left_bumper ? .3 : 0.5);
             }
         } else {
+            Gyro.TargetHeading = Gyro.CurrentGyroHeading;
             driveCartesian(rightStickX, rightStickY, rotateStick, fieldAngle());
         }
         _telemetry.addData("Gyro Heading: ", Gyro.CurrentGyroHeading);
@@ -147,17 +169,17 @@ public class NewMecanumDrive extends OscarCommon{
     }
 
     public static void forward(double power){
-        driveCartesian(0, power, 0, 0);
+        driveCartesian(0, power, Gyro.getCompensation(), 0);
     }
 
-    public static void backward(double power){ driveCartesian(0, -power, 0, 0); }
+    public static void backward(double power){ driveCartesian(0, -power, Gyro.getCompensation(), 0); }
 
     public static void right(double power){
-        driveCartesian(power, 0, 0, 0);
+        driveCartesian(power, 0, Gyro.getCompensation(), 0);
     }
 
     public static void left(double power){
-        driveCartesian(-power, 0, 0, 0);
+        driveCartesian(-power, 0, Gyro.getCompensation(), 0);
     }
 
 
@@ -166,7 +188,7 @@ public class NewMecanumDrive extends OscarCommon{
         Gyro.TargetHeading = heading;
         driveCartesian(0, power, Gyro.getCompensation(), fieldAngle());
 
-        return atTarget(distance);
+        return atTarget(distance, true);
     }
 
     public static boolean backward(double power, int distance, int heading){
@@ -176,7 +198,7 @@ public class NewMecanumDrive extends OscarCommon{
 
         driveCartesian(0, power, Gyro.getCompensation(), fieldAngle());
 
-        return atTarget(distance);
+        return atTarget(distance, false);
     }
 
     public static boolean right(double power, int distance, int heading){
@@ -184,7 +206,7 @@ public class NewMecanumDrive extends OscarCommon{
         distance = -distance;
         driveCartesian(power, 0, Gyro.getCompensation(), fieldAngle());
 
-        return atTarget(distance);
+        return atTarget(distance, false);
     }
 
     public static boolean left(double power, int distance, int heading){
@@ -192,7 +214,7 @@ public class NewMecanumDrive extends OscarCommon{
         power = -power;
         driveCartesian(power, 0, Gyro.getCompensation(), fieldAngle());
 
-        return atTarget(distance);
+        return atTarget(distance, true);
     }
 
     public static boolean turn(double speed, double heading){
@@ -205,12 +227,17 @@ public class NewMecanumDrive extends OscarCommon{
         return turn(0, heading);
     }
 
-    public static boolean atTarget(int distance){
+    public static boolean atTarget(int distance, boolean isForward){
         AutoStartPos = AutoStartPos == 0 ? _backLeft.getCurrentPosition() : AutoStartPos;
         AutoCurrentPos = _backLeft.getCurrentPosition();
         AutoTargetPos = AutoStartPos + distance;
 
-        atTarget = AutoStartPos != 0 && Math.abs(Math.abs(AutoCurrentPos) - Math.abs(AutoTargetPos)) < AUTO_MOVE_TOLERANCE;
+        if (isForward){
+            atTarget =  AutoStartPos != 0 && AutoCurrentPos > AutoTargetPos - AUTO_MOVE_TOLERANCE;
+        } else {
+            atTarget = AutoStartPos != 0 && AutoCurrentPos < AutoTargetPos + AUTO_MOVE_TOLERANCE;
+        }
+
         _telemetry.addData("Start Pos: ", AutoStartPos);
         _telemetry.addData("Current Pos: ", AutoCurrentPos);
         _telemetry.addData("Target Pos: ", AutoTargetPos);
